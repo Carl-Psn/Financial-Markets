@@ -1,260 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Financial Markets Quiz Trainer</title>
-  <!-- Tailwind CSS -->
+  <meta name="description" content="Entraîneur Mock Quizz 2 — valorisation actions (CGDDM, CAPM, PVGO).">
+  <title>Mock Quizz 2 — Marchés financiers</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- MathJax for rendering LaTeX formulas cleanly -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false }
+    };
+  </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4 md:p-6">
 
-  <!-- Top Reference Formulas Bar -->
-  <header class="w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-6 border-t-4 border-indigo-600">
-    <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2 text-center">Reference Formulas / Aide-mémoire</h2>
+  <nav class="w-full max-w-4xl mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap gap-2">
+      <span class="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-sm" aria-current="page">
+        Mock Quizz 2
+      </span>
+      <a href="financial_markets_trainer_mock_quizz_3.html" target="_blank" rel="noopener noreferrer"
+         class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
+        Mock Quizz 3 ↗
+      </a>
+    </div>
+    <p class="text-xs text-slate-500 max-w-md text-right">Un onglet par quizz — ouvrez le Quizz 3 dans un nouvel onglet pour réviser en parallèle.</p>
+  </nav>
+
+  <header class="w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-4 border-t-4 border-indigo-600">
+    <h1 class="text-lg font-bold text-slate-800 text-center mb-1">Mock Quizz 2 — Actions &amp; dividendes</h1>
+    <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2 text-center">Aide-mémoire</h2>
     <div class="text-center text-sm md:text-base text-slate-700 overflow-x-auto py-2 flex flex-wrap justify-around gap-4">
       <div>$$k_i = r_f + \beta_i \times (E(r_M) - r_f)$$</div>
-      <div>$$V_0 = \frac{D_1}{k - g} = \frac{(1 - b) \times E_1}{k - b \times ROE^{NewProjects}}$$</div>
+      <div>$$V_0 = \frac{D_1}{k - g} = \frac{(1 - b) \times E_1}{k - b \times ROE^{\text{NewProjects}}}$$</div>
       <div>$$P_0 = \frac{E_1}{k} + PVGO_0$$</div>
     </div>
   </header>
 
-  <!-- Main Container -->
   <main class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-6 md:p-8 flex flex-col gap-6">
 
-    <!-- Status Bar: Timer & Actions -->
     <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-      <div class="flex items-center gap-3">
-        <span class="text-xs uppercase font-semibold text-slate-500">Timer</span>
-        <div id="timer" class="text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md">03:00</div>
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs uppercase font-semibold text-slate-500">Chronomètre</span>
+          <div id="timer" class="text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md" role="timer" aria-live="polite">03:00</div>
+        </div>
+        <div class="text-xs text-slate-600">
+          Score session : <span id="score-display" class="font-bold text-indigo-700">0 / 0</span>
+        </div>
       </div>
       <div class="flex gap-2">
-        <button id="btn-random-vars" onclick="generateNewVariables()" class="px-3 py-2 text-xs font-semibold bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition">
-          🔀 New Variables
+        <button type="button" id="btn-random-vars" onclick="generateNewVariables()"
+                class="px-3 py-2 text-xs font-semibold bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition">
+          Nouvelles valeurs
         </button>
-        <button id="btn-next" onclick="nextQuestion()" class="px-3 py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
-          Next Question ➔
+        <button type="button" id="btn-next" onclick="nextQuestion()"
+                class="px-3 py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
+          Question suivante →
         </button>
       </div>
     </div>
 
-    <!-- Question Box -->
+    <div id="progress-bar" class="flex gap-1.5 justify-center" aria-hidden="true"></div>
+
     <div class="space-y-3">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-2">
         <span id="question-tag" class="text-xs font-bold tracking-wide uppercase px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">
           Question 1 / 5
         </span>
       </div>
-      <div id="question-text" class="text-slate-700 leading-relaxed text-base md:text-lg min-h-[80px]">
-        <!-- Dynamic Question Content -->
-      </div>
+      <div id="question-text" class="text-slate-700 leading-relaxed text-base md:text-lg min-h-[80px]"></div>
     </div>
 
-    <!-- Answer Input Section -->
     <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-      <label for="user-answer" class="block text-xs font-bold uppercase text-slate-600">Your Answer (€):</label>
+      <label for="user-answer" id="answer-label" class="block text-xs font-bold uppercase text-slate-600">Votre réponse (€) :</label>
       <div class="flex gap-2">
-        <input type="number" step="any" id="user-answer" placeholder="e.g. 445.45" onkeydown="if(event.key==='Enter') checkAnswer()"
-               class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-lg">
-        <button onclick="checkAnswer()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition">
-          Validate
+        <input type="number" step="any" id="user-answer" placeholder="ex. 445,45" onkeydown="if(event.key==='Enter') checkAnswer()"
+               class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-lg"
+               autocomplete="off" inputmode="decimal">
+        <button type="button" onclick="checkAnswer()"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+          Valider
         </button>
       </div>
       <div id="feedback" class="hidden text-sm font-semibold p-3 rounded-lg text-center"></div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="flex justify-between items-center pt-2">
-      <button id="btn-reveal" onclick="revealCorrection()" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold underline">
-        Show Detailed Correction
+      <button type="button" id="btn-reveal" onclick="revealCorrection()"
+              class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold underline">
+        Afficher la correction détaillée
       </button>
     </div>
 
-    <!-- Detailed Correction View -->
     <div id="correction-box" class="hidden border-t-2 border-indigo-100 pt-4 space-y-4">
-      <h3 class="text-md font-bold text-slate-800">Detailed Solution:</h3>
-      
+      <h3 class="text-md font-bold text-slate-800">Correction détaillée</h3>
       <div class="space-y-2 bg-indigo-50/50 p-4 rounded-lg border border-indigo-100 text-sm">
-        <h4 class="font-bold text-indigo-900 uppercase text-xs">Generic Formula:</h4>
+        <h4 class="font-bold text-indigo-900 uppercase text-xs">Formule générique</h4>
         <div id="correction-formula" class="text-slate-800 font-medium py-1"></div>
       </div>
-
       <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm">
-        <h4 class="font-bold text-slate-700 uppercase text-xs">Step-by-Step Calculation:</h4>
+        <h4 class="font-bold text-slate-700 uppercase text-xs">Calcul pas à pas</h4>
         <div id="correction-steps" class="space-y-2 text-slate-700"></div>
       </div>
+      <p id="correction-expected" class="text-sm font-semibold text-emerald-800 bg-emerald-50 p-3 rounded-lg"></p>
     </div>
-
   </main>
 
   <script>
-    // Templates for the 5 questions with variable generator functions and solution logic
+    const QUIZ_META = {
+      id: 'mock-quizz-2',
+      title: 'Mock Quizz 2',
+      questionCount: 5,
+      timerSeconds: 180
+    };
+
     const questionTemplates = [
       {
         id: 1,
-        title: "Question 1 (CGDDM Price)",
+        title: 'Q1 — Prix CGDDM',
+        answerKind: 'currency',
         generate: () => {
-          const d1 = Math.floor(Math.random() * 40) + 20; // 20 to 60
-          const k = (Math.floor(Math.random() * 10) + 12) / 100; // 12% to 21%
-          const g = (Math.floor(Math.random() * 6) + 3) / 100; // 3% to 8%
+          const d1 = Math.floor(Math.random() * 40) + 20;
+          const k = (Math.floor(Math.random() * 10) + 12) / 100;
+          const g = (Math.floor(Math.random() * 6) + 3) / 100;
           const v0 = d1 / (k - g);
           return {
-            text: `What is the value of company A's shares as of today (at t=0) using the Constant-Growth Dividend Discount Model (CGDDM) if the next dividend paid exactly a year from today at date t=1 is expected to be <b>${d1}</b> euros/share, the required rate of return on the shares is <b>${(k*100).toFixed(1)} percent</b>, and the growth rate of dividends is <b>${(g*100).toFixed(1)} percent</b> and constant forever?`,
+            text: `Quelle est la valeur des actions de la société A aujourd’hui (t=0) avec le modèle de Gordon (CGDDM) si le prochain dividende attendu dans un an (t=1) est de <b>${d1}</b> €/action, le taux de rendement exigé est de <b>${(k * 100).toFixed(1)} %</b> par an et le taux de croissance des dividendes est de <b>${(g * 100).toFixed(1)} %</b> et constant à l’infini ?`,
             target: v0,
             params: { d1, k, g },
-            formula: "$$V_0 = \\frac{D_1}{k - g}$$",
+            formula: '$$V_0 = \\frac{D_1}{k - g}$$',
             getSteps: (p) => [
-              `Identify variables: $D_1 = ${p.d1}\\text{ €}$, $k = ${(p.k*100).toFixed(1)}\\% = ${p.k}$, $g = ${(p.g*100).toFixed(1)}\\% = ${p.g}$`,
-              `Denominator difference: $k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}$`,
-              `Result: $V_0 = \\frac{${p.d1}}{${(p.k - p.g).toFixed(4)}} = \\mathbf{${(p.d1/(p.k-p.g)).toFixed(4)}\\text{ €}}$`
+              `Variables : $D_1 = ${p.d1}\\,€$, $k = ${(p.k * 100).toFixed(1)}\\% = ${p.k}$, $g = ${(p.g * 100).toFixed(1)}\\% = ${p.g}$`,
+              `Dénominateur : $k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}$`,
+              `Résultat : $V_0 = \\frac{${p.d1}}{${(p.k - p.g).toFixed(4)}} = \\mathbf{${(p.d1 / (p.k - p.g)).toFixed(2)}\\,€}$`
             ]
           };
         }
       },
       {
         id: 2,
-        title: "Question 2 (Next Dividend)",
+        title: 'Q2 — Prochain dividende',
+        answerKind: 'currency',
         generate: () => {
-          const p0 = Math.floor(Math.random() * 80) + 50; // 50 to 130
-          const k = (Math.floor(Math.random() * 8) + 12) / 100; // 12% to 19%
-          const g = (Math.floor(Math.random() * 5) + 3) / 100; // 3% to 7%
+          const p0 = Math.floor(Math.random() * 80) + 50;
+          const k = (Math.floor(Math.random() * 8) + 12) / 100;
+          const g = (Math.floor(Math.random() * 5) + 3) / 100;
           const d1 = p0 * (k - g);
           return {
-            text: `Company Q's required rate of return is <b>${(k*100).toFixed(1)} percent</b> per year and its dividends will be growing at <b>${(g*100).toFixed(1)} percent</b> per year forever. If today (at t=0) company Q's share price is <b>${p0} euro/share</b>, what must be the next year's expected dividend per share at date t=1?`,
+            text: `Le taux de rendement exigé de la société Q est de <b>${(k * 100).toFixed(1)} %</b> par an et ses dividendes croissent de <b>${(g * 100).toFixed(1)} %</b> par an à l’infini. Si le cours aujourd’hui (t=0) est de <b>${p0} €/action</b>, quel est le dividende attendu l’année prochaine (t=1) ?`,
             target: d1,
             params: { p0, k, g },
-            formula: "$$D_1 = P_0 \\times (k - g)$$",
+            formula: '$$D_1 = P_0 \\times (k - g)$$',
             getSteps: (p) => [
-              `Identify variables: $P_0 = ${p.p0}\\text{ €}$, $k = ${(p.k*100).toFixed(1)}\\%$, $g = ${(p.g*100).toFixed(1)}\\%$`,
-              `Rate spread: $k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}$`,
-              `Result: $D_1 = ${p.p0} \\times ${(p.k - p.g).toFixed(4)} = \\mathbf{${(p.p0*(p.k-p.g)).toFixed(4)}\\text{ €}}$`
+              `Variables : $P_0 = ${p.p0}\\,€$, $k = ${(p.k * 100).toFixed(1)}\\%$, $g = ${(p.g * 100).toFixed(1)}\\%$`,
+              `Écart de taux : $k - g = ${(p.k - p.g).toFixed(4)}$`,
+              `Résultat : $D_1 = ${p.p0} \\times ${(p.k - p.g).toFixed(4)} = \\mathbf{${(p.p0 * (p.k - p.g)).toFixed(2)}\\,€}$`
             ]
           };
         }
       },
       {
         id: 3,
-        title: "Question 3 (PVGO)",
+        title: 'Q3 — PVGO',
+        answerKind: 'currency',
         generate: () => {
-          const beta = parseFloat(((Math.random() * 0.8) + 0.6).toFixed(2)); // 0.60 to 1.40
-          const e_rm = (Math.floor(Math.random() * 6) + 10) / 100; // 10% to 15%
-          const rf = (Math.floor(Math.random() * 20) + 5) / 1000; // 0.5% to 2.5%
-          const e1 = Math.floor(Math.random() * 10) + 8; // 8 to 17
-          const p0 = Math.floor(Math.random() * 80) + 120; // 120 to 200
-          
+          const beta = parseFloat(((Math.random() * 0.8) + 0.6).toFixed(2));
+          const e_rm = (Math.floor(Math.random() * 6) + 10) / 100;
+          const rf = (Math.floor(Math.random() * 20) + 5) / 1000;
+          const e1 = Math.floor(Math.random() * 10) + 8;
+          const p0 = Math.floor(Math.random() * 80) + 120;
           const k = rf + beta * (e_rm - rf);
           const p0_no_growth = e1 / k;
           const pvgo = p0 - p0_no_growth;
-
           return {
-            text: `Firm B's shares have a CAPM beta of <b>${beta}</b>, the expected rate of return on the market portfolio is <b>${(e_rm*100).toFixed(1)} percent</b> per year, risk-free rate is <b>${(rf*100).toFixed(1)} percent</b> per year. Next year's expected earnings for firm B is <b>${e1} euro/share</b>. Today's stock price for firm B is <b>${p0} euro/share</b>. What is the present value of the growth opportunities (PVGO) for firm B as of today (at t=0)?`,
+            text: `Les actions de B ont un bêta CAPM de <b>${beta}</b>, le rendement attendu du marché est de <b>${(e_rm * 100).toFixed(1)} %</b> par an, le taux sans risque de <b>${(rf * 100).toFixed(1)} %</b>. Le BPA attendu l’année prochaine est de <b>${e1} €/action</b> et le cours actuel de <b>${p0} €/action</b>. Quelle est la valeur actuelle des opportunités de croissance (PVGO) à t=0 ?`,
             target: pvgo,
             params: { beta, e_rm, rf, e1, p0, k, p0_no_growth },
-            formula: "$$k = r_f + \\beta \\times (E(r_M) - r_f) \\quad \\text{and} \\quad PVGO_0 = P_0 - \\frac{E_1}{k}$$",
+            formula: '$$k = r_f + \\beta \\times (E(r_M) - r_f) \\quad ; \\quad PVGO_0 = P_0 - \\frac{E_1}{k}$$',
             getSteps: (p) => [
-              `Calculate required rate $k$ (CAPM): $k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = \\mathbf{${(p.k*100).toFixed(4)}\\%}$`,
-              `Calculate value without growth ($P_0^{\\text{no growth}}$): $P_0^{\\text{no growth}} = \\frac{${p.e1}}{${p.k.toFixed(4)}} = ${(p.p0_no_growth).toFixed(4)}\\text{ €}$`,
-              `Isolate PVGO: $PVGO_0 = ${p.p0} - ${(p.p0_no_growth).toFixed(4)} = \\mathbf{${(p.p0 - p.p0_no_growth).toFixed(4)}\\text{ €}}$`
+              `Taux exigé (CAPM) : $k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%$`,
+              `Valeur sans croissance : $\\frac{E_1}{k} = \\frac{${p.e1}}{${p.k.toFixed(4)}} = ${p.p0_no_growth.toFixed(2)}\\,€$`,
+              `PVGO : $PVGO_0 = ${p.p0} - ${p.p0_no_growth.toFixed(2)} = \\mathbf{${(p.p0 - p.p0_no_growth).toFixed(2)}\\,€}$`
             ]
           };
         }
       },
       {
         id: 4,
-        title: "Question 4 (Stock Price P1 with Special Dividend)",
+        title: 'Q4 — Prix P₁ (dividende exceptionnel)',
+        answerKind: 'currency',
         generate: () => {
-          const rf = (Math.floor(Math.random() * 20)) / 1000; // 0% to 2%
-          const beta = parseFloat(((Math.random() * 0.8) + 0.4).toFixed(2)); // 0.4 to 1.2
-          const e_rm = (Math.floor(Math.random() * 6) + 10) / 100; // 10% to 15%
-          const d_reg = Math.floor(Math.random() * 6) + 5; // 5 to 10
-          const d_spec = parseFloat((Math.random() * 8 + 5).toFixed(1)); // 5.0 to 13.0
-
+          const rf = Math.floor(Math.random() * 20) / 1000;
+          const beta = parseFloat(((Math.random() * 0.8) + 0.4).toFixed(2));
+          const e_rm = (Math.floor(Math.random() * 6) + 10) / 100;
+          const d_reg = Math.floor(Math.random() * 6) + 5;
+          const d_spec = parseFloat((Math.random() * 8 + 5).toFixed(1));
           const k = rf + beta * (e_rm - rf);
           const p1 = (d_reg / k) + (d_spec / (1 + k));
-
           return {
-            text: `Firm OilCo is expected to pay a constant regular dividend of <b>${d_reg} euro/year</b> in every year forever starting with a year from t=0 (i.e., at dates t=1, 2, 3,..., ∞) -- these dividends do not grow. OilCo is expected to pay a one-time special dividend of <b>${d_spec} euro/share</b> at date t=2 (on top of the regular dividend). Assume that CAPM holds: risk-free rate is <b>${(rf*100).toFixed(1)} percent</b>, OilCo has a beta of <b>${beta}</b>, the expected return on the market is <b>${(e_rm*100).toFixed(1)} percent</b>. What is the company's expected stock price at date t=1 right after the payment of the first regular dividend?`,
+            text: `OilCo versera un dividende ordinaire constant de <b>${d_reg} €/an</b> à partir de t=1 (sans croissance). Un dividende exceptionnel de <b>${d_spec} €/action</b> est prévu à t=2 (en plus du dividende ordinaire). CAPM : $r_f =$ <b>${(rf * 100).toFixed(1)} %</b>, $\\beta =$ <b>${beta}</b>, $E(r_M) =$ <b>${(e_rm * 100).toFixed(1)} %</b>. Quel est le cours attendu à t=1 juste après le premier dividende ordinaire ?`,
             target: p1,
-            params: { rf, beta, e_rm, d_reg, d_spec, k },
-            formula: "$$P_1 = \\frac{D_{\\text{regular}}}{k} + \\frac{D_{\\text{special}}}{1 + k}$$",
+            params: { rf, beta, e_rm, d_reg, d_spec, k, p1 },
+            formula: '$$P_1 = \\frac{D_{\\text{ordinaire}}}{k} + \\frac{D_{\\text{exceptionnel}}}{1 + k}$$',
             getSteps: (p) => [
-              `Calculate required return $k$: $k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = \\mathbf{${(p.k*100).toFixed(2)}\\%}$`,
-              `Valuation of regular perpetuity at $t=1$: $\\frac{${p.d_reg}}{${p.k.toFixed(4)}} = ${(p.d_reg / p.k).toFixed(4)}$`,
-              `Discount special dividend from $t=2$ back to $t=1$: $\\frac{${p.d_spec}}{1 + ${p.k.toFixed(4)}} = ${(p.d_spec / (1 + p.k)).toFixed(4)}$`,
-              `Sum both components: $P_1 = ${(p.d_reg / p.k).toFixed(4)} + ${(p.d_spec / (1 + p.k)).toFixed(4)} = \\mathbf{${p1.toFixed(4)}\\text{ €}}$`
+              `$k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%$`,
+              `Perpetuité ordinaire à t=1 : $\\frac{${p.d_reg}}{${p.k.toFixed(4)}} = ${(p.d_reg / p.k).toFixed(2)}$`,
+              `Dividende exceptionnel actualisé de t=2 à t=1 : $\\frac{${p.d_spec}}{1 + ${p.k.toFixed(4)}} = ${(p.d_spec / (1 + p.k)).toFixed(2)}$`,
+              `$P_1 = ${(p.d_reg / p.k).toFixed(2)} + ${(p.d_spec / (1 + p.k)).toFixed(2)} = \\mathbf{${p.p1.toFixed(2)}\\,€}$`
             ]
           };
         }
       },
       {
         id: 5,
-        title: "Question 5 (Dividend Cancellation Impact)",
+        title: 'Q5 — Annulation de dividende',
+        answerKind: 'currency',
         generate: () => {
-          const d1 = Math.floor(Math.random() * 25) + 20; // 20 to 45
-          const k = (Math.floor(Math.random() * 10) + 15) / 100; // 15% to 24%
+          const d1 = Math.floor(Math.random() * 25) + 20;
+          const k = (Math.floor(Math.random() * 10) + 15) / 100;
           const delta_p0 = -d1 / (1 + k);
-
           return {
-            text: `As of last night, the utility company C was expected to pay a dividend of <b>${d1} euro/share</b> next year at date t=1, and the level of these dividends is expected to stay constant forever (i.e., dividends do not grow). The required rate of return on C shares is <b>${(k*100).toFixed(1)} percent</b> per year. This morning the management announces that they will skip next year's dividend at t=1 but that the company will resume paying the constant dividends starting with date t=2. What is the stock price change at the announcement?`,
+            text: `Hier, la société C devait verser <b>${d1} €/action</b> à t=1, puis des dividendes constants à l’infini (sans croissance). Le taux exigé est de <b>${(k * 100).toFixed(1)} %</b>. Ce matin, la direction annonce l’annulation du dividende de t=1 et la reprise des paiements constants à partir de t=2. Quelle est la variation de cours à l’annonce ?`,
             target: delta_p0,
-            params: { d1, k },
-            formula: "$$\\Delta P_0 = - \\frac{D_1}{1 + k}$$",
+            params: { d1, k, delta_p0 },
+            formula: '$$\\Delta P_0 = - \\frac{D_1}{1 + k}$$',
             getSteps: (p) => [
-              `Principle: The skipped dividend at $t=1$ equals the present value lost from $t=1$ discounted back to $t=0$.`,
-              `Calculate direct loss: $\\Delta P_0 = - \\frac{${p.d1}}{1 + ${p.k}} = - \\frac{${p.d1}}{${(1+p.k).toFixed(2)}} = \\mathbf{${delta_p0.toFixed(4)}\\text{ €}}$`
+              `Le dividende manqué à t=1 se traduit par une perte de valeur actualisée à t=0.`,
+              `$\\Delta P_0 = - \\frac{${p.d1}}{1 + ${p.k}} = \\mathbf{${p.delta_p0.toFixed(2)}\\,€}$`
             ]
           };
         }
       }
     ];
 
-    // App State
     let shuffledIndices = [];
     let currentOrderIndex = 0;
     let currentData = null;
+    let currentTemplate = null;
     let timerInterval = null;
-    let timeLeft = 180; // 3 minutes
+    let timeLeft = QUIZ_META.timerSeconds;
+    let sessionCorrect = 0;
+    let sessionAttempts = 0;
+    let answeredThisQuestion = false;
 
-    // Shuffle questions array randomly
     function shuffleQuestions() {
-      shuffledIndices = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+      shuffledIndices = questionTemplates.map((_, i) => i).sort(() => Math.random() - 0.5);
       currentOrderIndex = 0;
     }
 
-    // Load question on screen
+    function renderProgressDots() {
+      const bar = document.getElementById('progress-bar');
+      bar.innerHTML = '';
+      for (let i = 0; i < QUIZ_META.questionCount; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'h-2 flex-1 max-w-[4rem] rounded-full transition-colors ' +
+          (i === currentOrderIndex ? 'bg-indigo-600' : i < currentOrderIndex ? 'bg-indigo-300' : 'bg-slate-200');
+        bar.appendChild(dot);
+      }
+    }
+
+    function formatExpected(value, kind) {
+      if (kind === 'decimal') return value.toFixed(4) + ' (décimal)';
+      return value.toFixed(2) + ' €';
+    }
+
+    function updateAnswerLabel(kind) {
+      const label = document.getElementById('answer-label');
+      const input = document.getElementById('user-answer');
+      if (kind === 'decimal') {
+        label.textContent = 'Votre réponse (décimal, ex. 0,0123 pour 1,23 %) :';
+        input.placeholder = 'ex. 0,0137';
+      } else {
+        label.textContent = 'Votre réponse (€) :';
+        input.placeholder = 'ex. 445,45';
+      }
+    }
+
+    function isAnswerCorrect(userVal, expected, kind) {
+      if (kind === 'decimal') {
+        return Math.abs(userVal - expected) < 0.0002 ||
+          (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.01);
+      }
+      return Math.abs(userVal - expected) < 0.1 ||
+        (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.01);
+    }
+
+    function typesetMath() {
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().catch(() => {});
+      }
+    }
+
     function loadQuestion() {
       clearInterval(timerInterval);
-      timeLeft = 180;
+      timeLeft = QUIZ_META.timerSeconds;
+      answeredThisQuestion = false;
       updateTimerDisplay();
       startTimer();
 
       const templateIndex = shuffledIndices[currentOrderIndex];
-      const template = questionTemplates[templateIndex];
-      currentData = template.generate();
+      currentTemplate = questionTemplates[templateIndex];
+      currentData = currentTemplate.generate();
 
-      // UI updates
-      document.getElementById('question-tag').innerText = `Question ${currentOrderIndex + 1} / 5 - ${template.title}`;
+      document.getElementById('question-tag').innerText =
+        `${QUIZ_META.title} — Question ${currentOrderIndex + 1} / ${QUIZ_META.questionCount} · ${currentTemplate.title}`;
       document.getElementById('question-text').innerHTML = currentData.text;
-      
-      // Reset inputs & feedback
+      updateAnswerLabel(currentTemplate.answerKind);
+
       document.getElementById('user-answer').value = '';
       const feedback = document.getElementById('feedback');
       feedback.classList.add('hidden');
-      feedback.className = "hidden text-sm font-semibold p-3 rounded-lg text-center";
-
-      // Hide correction
+      feedback.className = 'hidden text-sm font-semibold p-3 rounded-lg text-center';
       document.getElementById('correction-box').classList.add('hidden');
-
-      // Re-render formulas
-      if (window.MathJax) {
-        MathJax.typesetPromise();
-      }
+      renderProgressDots();
+      typesetMath();
     }
 
-    // Timer controls
     function startTimer() {
       timerInterval = setInterval(() => {
         timeLeft--;
@@ -262,8 +326,8 @@
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
           const feedback = document.getElementById('feedback');
-          feedback.innerText = "⏰ Time's up! Check the correction below.";
-          feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block";
+          feedback.innerText = '⏰ Temps écoulé — consultez la correction ci-dessous.';
+          feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block';
         }
       }, 1000);
     }
@@ -274,20 +338,19 @@
       const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       const timerEl = document.getElementById('timer');
       timerEl.innerText = display;
-
-      if (timeLeft <= 30) {
-        timerEl.className = "text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse";
-      } else {
-        timerEl.className = "text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md";
-      }
+      timerEl.className = timeLeft <= 30
+        ? 'text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse'
+        : 'text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md';
     }
 
-    // Generate new variables for current question
+    function updateScoreDisplay() {
+      document.getElementById('score-display').textContent = `${sessionCorrect} / ${sessionAttempts}`;
+    }
+
     function generateNewVariables() {
       loadQuestion();
     }
 
-    // Next question handler
     function nextQuestion() {
       currentOrderIndex++;
       if (currentOrderIndex >= questionTemplates.length) {
@@ -296,54 +359,52 @@
       loadQuestion();
     }
 
-    // Check user answer
     function checkAnswer() {
       const userVal = parseFloat(document.getElementById('user-answer').value);
       const feedback = document.getElementById('feedback');
+      const kind = currentTemplate.answerKind;
 
       if (isNaN(userVal)) {
-        feedback.innerText = "Please enter a valid numeric value.";
-        feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block";
+        feedback.innerText = 'Veuillez entrer un nombre valide.';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block';
         return;
       }
 
       const expected = currentData.target;
-      // Allow 1% relative margin or 0.05 absolute margin of error
-      const isCorrect = Math.abs(userVal - expected) < 0.1 || Math.abs((userVal - expected) / expected) < 0.01;
+      const isCorrect = isAnswerCorrect(userVal, expected, kind);
+
+      if (!answeredThisQuestion) {
+        sessionAttempts++;
+        if (isCorrect) sessionCorrect++;
+        answeredThisQuestion = true;
+        updateScoreDisplay();
+      }
 
       if (isCorrect) {
-        feedback.innerText = "Correct! Great job!";
-        feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-emerald-100 text-emerald-800 block";
+        feedback.innerText = 'Correct — bravo !';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-emerald-100 text-emerald-800 block';
       } else {
-        feedback.innerText = "Incorrect answer. Try again or check the detailed correction.";
-        feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-rose-100 text-rose-800 block";
+        feedback.innerText = 'Réponse incorrecte. Réessayez ou affichez la correction.';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-rose-100 text-rose-800 block';
       }
     }
 
-    // Reveal correction & stop timer
     function revealCorrection() {
       clearInterval(timerInterval);
-      
-      const correctionBox = document.getElementById('correction-box');
-      const formulaEl = document.getElementById('correction-formula');
-      const stepsEl = document.getElementById('correction-steps');
-
-      formulaEl.innerHTML = currentData.formula;
-      
+      document.getElementById('correction-formula').innerHTML = currentData.formula;
       const steps = currentData.getSteps(currentData.params);
-      stepsEl.innerHTML = steps.map(step => `<p>• ${step}</p>`).join('');
-
-      correctionBox.classList.remove('hidden');
-
-      if (window.MathJax) {
-        MathJax.typesetPromise();
-      }
+      document.getElementById('correction-steps').innerHTML =
+        steps.map(step => `<p>• ${step}</p>`).join('');
+      document.getElementById('correction-expected').innerText =
+        'Réponse attendue : ' + formatExpected(currentData.target, currentTemplate.answerKind);
+      document.getElementById('correction-box').classList.remove('hidden');
+      typesetMath();
     }
 
-    // Initialize App
     window.onload = () => {
       shuffleQuestions();
       loadQuestion();
+      updateScoreDisplay();
     };
   </script>
 </body>

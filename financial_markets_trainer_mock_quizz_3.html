@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Entraîneur Mock Quizz 3 — obligations, taux spot et YTM.">
+  <title>Mock Quizz 3 — Marchés financiers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4 md:p-6">
+
+  <nav class="w-full max-w-4xl mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap gap-2">
+      <a href="financial_markets_trainer.html" target="_blank" rel="noopener noreferrer"
+         class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white text-teal-700 border border-teal-200 hover:bg-teal-50 transition shadow-sm">
+        Mock Quizz 2 ↗
+      </a>
+      <span class="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white shadow-sm" aria-current="page">
+        Mock Quizz 3
+      </span>
+    </div>
+    <p class="text-xs text-slate-500 max-w-md text-right">Un onglet par quizz — ouvrez le Quizz 2 dans un nouvel onglet pour réviser en parallèle.</p>
+  </nav>
+
+  <header class="w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-4 border-t-4 border-teal-600">
+    <h1 class="text-lg font-bold text-slate-800 text-center mb-1">Mock Quizz 3 — Obligations &amp; taux</h1>
+    <h2 class="text-xs font-bold uppercase tracking-wider text-teal-600 mb-2 text-center">Aide-mémoire</h2>
+    <div class="text-center text-sm md:text-base text-slate-700 overflow-x-auto py-2 space-y-3">
+      <div>$$P_0 = \frac{C}{1+y} + \frac{C}{(1+y)^2} + \cdots + \frac{C+N}{(1+y)^T} = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{YTM}$$</div>
+      <div>$$P_0 = \frac{C}{1+r_1} + \frac{C}{(1+r_2)^2} + \cdots + \frac{C+N}{(1+r_T)^T}, \quad r_t = \text{taux spot}$$</div>
+    </div>
+  </header>
+
+  <main class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-6 md:p-8 flex flex-col gap-6">
+
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs uppercase font-semibold text-slate-500">Chronomètre</span>
+          <div id="timer" class="text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md" role="timer" aria-live="polite">03:00</div>
+        </div>
+        <div class="text-xs text-slate-600">
+          Score session : <span id="score-display" class="font-bold text-teal-700">0 / 0</span>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" id="btn-random-vars" onclick="generateNewVariables()"
+                class="px-3 py-2 text-xs font-semibold bg-teal-50 text-teal-700 rounded-lg border border-teal-200 hover:bg-teal-100 transition">
+          Nouvelles valeurs
+        </button>
+        <button type="button" id="btn-next" onclick="nextQuestion()"
+                class="px-3 py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
+          Question suivante →
+        </button>
+      </div>
+    </div>
+
+    <div id="progress-bar" class="flex gap-1.5 justify-center" aria-hidden="true"></div>
+
+    <div class="space-y-3">
+      <div class="flex items-center justify-between gap-2">
+        <span id="question-tag" class="text-xs font-bold tracking-wide uppercase px-2.5 py-1 bg-teal-100 text-teal-800 rounded-full">
+          Question 1 / 5
+        </span>
+      </div>
+      <div id="question-text" class="text-slate-700 leading-relaxed text-base md:text-lg min-h-[80px]"></div>
+    </div>
+
+    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+      <label for="user-answer" id="answer-label" class="block text-xs font-bold uppercase text-slate-600">Votre réponse (€) :</label>
+      <p id="answer-hint" class="text-xs text-slate-500 hidden"></p>
+      <div class="flex gap-2">
+        <input type="number" step="any" id="user-answer" placeholder="ex. 210,95" onkeydown="if(event.key==='Enter') checkAnswer()"
+               class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none text-lg"
+               autocomplete="off" inputmode="decimal">
+        <button type="button" onclick="checkAnswer()"
+                class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+          Valider
+        </button>
+      </div>
+      <div id="feedback" class="hidden text-sm font-semibold p-3 rounded-lg text-center"></div>
+    </div>
+
+    <div class="flex justify-between items-center pt-2">
+      <button type="button" id="btn-reveal" onclick="revealCorrection()"
+              class="text-sm text-teal-700 hover:text-teal-900 font-semibold underline">
+        Afficher la correction détaillée
+      </button>
+    </div>
+
+    <div id="correction-box" class="hidden border-t-2 border-teal-100 pt-4 space-y-4">
+      <h3 class="text-md font-bold text-slate-800">Correction détaillée</h3>
+      <div class="space-y-2 bg-teal-50/50 p-4 rounded-lg border border-teal-100 text-sm">
+        <h4 class="font-bold text-teal-900 uppercase text-xs">Formule générique</h4>
+        <div id="correction-formula" class="text-slate-800 font-medium py-1"></div>
+      </div>
+      <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm">
+        <h4 class="font-bold text-slate-700 uppercase text-xs">Calcul pas à pas</h4>
+        <div id="correction-steps" class="space-y-2 text-slate-700"></div>
+      </div>
+      <p id="correction-expected" class="text-sm font-semibold text-emerald-800 bg-emerald-50 p-3 rounded-lg"></p>
+    </div>
+  </main>
+
+  <script>
+    const QUIZ_META = {
+      id: 'mock-quizz-3',
+      title: 'Mock Quizz 3',
+      questionCount: 5,
+      timerSeconds: 180
+    };
+
+    /** Fixed mock values from Mock Quizz 3.md (used as defaults in first draw ranges centered on exam numbers). */
+    const questionTemplates = [
+      {
+        id: 1,
+        title: 'Q1 — Obligation zéro-coupon (prix)',
+        answerKind: 'currency',
+        decimals: 2,
+        generate: () => {
+          const N = 1000;
+          const T = Math.floor(Math.random() * 11) + 18;
+          const yPct = Math.floor(Math.random() * 6) + 5;
+          const y = yPct / 100;
+          const p0 = N / Math.pow(1 + y, T);
+          const denom = Math.pow(1 + y, T);
+          return {
+            text: `L’obligation zéro-coupon d’État Z a une valeur nominale de <b>${N} €</b> et une maturité de <b>${T} ans</b> à partir d’aujourd’hui (t=0). Si le rendement à l’échéance (YTM) est de <b>${yPct} %</b> par an, quel est le prix de Z aujourd’hui ?`,
+            target: p0,
+            params: { N, T, y, yPct, p0, denom },
+            formula: '$$P_0 = \\frac{N}{(1+y)^T}$$',
+            getSteps: (p) => [
+              `Données : $N = ${p.N}\\,€$, $T = ${p.T}$, $y = ${p.yPct}\\% = ${p.y}$`,
+              `$(1+y)^T = 1.${p.yPct.toString().padStart(2, '0')}...^{${p.T}} = ${p.denom.toFixed(5)}$`,
+              `$P_0 = \\frac{${p.N}}{${p.denom.toFixed(5)}} = \\mathbf{${p.p0.toFixed(2)}\\,€}$`
+            ]
+          };
+        }
+      },
+      {
+        id: 2,
+        title: 'Q2 — Prix avec taux spot',
+        answerKind: 'currency',
+        decimals: 2,
+        generate: () => {
+          const r1Pct = Math.floor(Math.random() * 4) + 1;
+          const r2Pct = Math.floor(Math.random() * 6) + 5;
+          const r1 = r1Pct / 100;
+          const r2 = r2Pct / 100;
+          const N = 100;
+          const couponPct = Math.floor(Math.random() * 5) + 10;
+          const C = (couponPct / 100) * N;
+          const p0 = C / (1 + r1) + (C + N) / Math.pow(1 + r2, 2);
+          const term1 = C / (1 + r1);
+          const term2 = (C + N) / Math.pow(1 + r2, 2);
+          return {
+            text: `Aujourd’hui, le taux sans risque 1 an est $r_1 =$ <b>${r1Pct} %</b> et le taux 2 ans est $r_2 =$ <b>${r2Pct} %</b>. Quel est le prix d’une obligation sans risque de défaut B, maturité <b>2 ans</b>, nominal <b>${N} €</b>, taux de coupon annuel <b>${couponPct} %</b> (un coupon par an) ? <span class="text-sm text-slate-500">(Arrondir à 2 décimales.)</span>`,
+            target: p0,
+            params: { r1, r2, r1Pct, r2Pct, N, C, couponPct, p0, term1, term2 },
+            formula: '$$P_0 = \\frac{C}{1+r_1} + \\frac{C+N}{(1+r_2)^2}$$',
+            getSteps: (p) => [
+              `Coupon : $C = ${p.couponPct}\\% \\times ${p.N} = ${p.C}\\,€$ ; flux t=2 : $C+N = ${(p.C + p.N).toFixed(2)}\\,€$`,
+              `$\\frac{C}{1+r_1} = \\frac{${p.C}}{${(1 + p.r1).toFixed(2)}} = ${p.term1.toFixed(6)}$`,
+              `$\\frac{C+N}{(1+r_2)^2} = \\frac{${p.C + p.N}}{${Math.pow(1 + p.r2, 2).toFixed(4)}} = ${p.term2.toFixed(6)}$`,
+              `$P_0 = ${p.term1.toFixed(2)} + ${p.term2.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}\\,€}$`
+            ]
+          };
+        }
+      },
+      {
+        id: 3,
+        title: 'Q3 — Prix sans arbitrage (réplication)',
+        answerKind: 'currency',
+        decimals: 0,
+        generate: () => {
+          const face = 100;
+          const pA = Math.floor(Math.random() * 5) + 94;
+          const pB = Math.floor(Math.random() * 5) + 88;
+          const N_C = 1000;
+          const couponPct = 10;
+          const cf1 = (couponPct / 100) * N_C;
+          const cf2 = cf1 + N_C;
+          const unitsA = cf1 / face;
+          const unitsB = cf2 / face;
+          const pC = unitsA * pA + unitsB * pB;
+          return {
+            text: `<p class="mb-2">Obligation A : maturité 1 an, coupon 0 %, nominal <b>${face} €</b>, prix <b>${pA} €</b>.</p>
+              <p class="mb-2">Obligation B : maturité 2 ans, coupon 0 %, nominal <b>${face} €</b>, prix <b>${pB} €</b>.</p>
+              <p>Obligation C : maturité 2 ans, coupon <b>${couponPct} %</b> par an (paiement annuel), nominal <b>${N_C} €</b>.</p>
+              <p class="mt-2 font-medium">Quel est le prix sans arbitrage de l’obligation C ?</p>`,
+            target: pC,
+            params: { face, pA, pB, N_C, couponPct, cf1, cf2, unitsA, unitsB, pC },
+            formula: '$$P_C = (\\text{unités A} \\times P_A) + (\\text{unités B} \\times P_B)$$',
+            getSteps: (p) => [
+              `Flux C : $CF_1 = ${p.couponPct}\\% \\times ${p.N_C} = ${p.cf1}\\,€$, $CF_2 = ${p.cf1} + ${p.N_C} = ${p.cf2}\\,€$`,
+              `Réplication : ${p.unitsA} × A pour t=1 (${p.cf1}/${p.face}), ${p.unitsB} × B pour t=2 (${p.cf2}/${p.face})`,
+              `$P_C = ${p.unitsA} \\times ${p.pA} + ${p.unitsB} \\times ${p.pB} = ${p.unitsA * p.pA} + ${p.unitsB * p.pB} = \\mathbf{${p.pC.toFixed(0)}\\,€}$`,
+              `Vérification facteurs d’actualisation : $d_1 = P_A/N = ${(p.pA / p.face).toFixed(2)}$, $d_2 = P_B/N = ${(p.pB / p.face).toFixed(2)}$ → $P_C = ${p.cf1} \\times d_1 + ${p.cf2} \\times d_2 = ${(p.cf1 * p.pA / p.face + p.cf2 * p.pB / p.face).toFixed(0)}\\,€$`
+            ]
+          };
+        }
+      },
+      {
+        id: 4,
+        title: 'Q4 — YTM (zéro-coupon)',
+        answerKind: 'decimal',
+        decimals: 4,
+        generate: () => {
+          const N = 1000;
+          const T = Math.floor(Math.random() * 5) + 7;
+          const yTruePct = (Math.floor(Math.random() * 120) + 80) / 100;
+          const y = yTruePct / 100;
+          const p0 = Math.round(N / Math.pow(1 + y, T));
+          const yCalc = Math.pow(N / p0, 1 / T) - 1;
+          return {
+            text: `Une obligation zéro-coupon d’État, maturité <b>${T} ans</b>, nominal <b>${N} €</b>, se négocie aujourd’hui à <b>${p0} €</b> (t=0). Quel est le rendement à l’échéance (YTM) ? <span class="text-sm font-semibold text-teal-800">Saisissez un décimal (ex. 1,37 % → <b>0,0137</b>).</span>`,
+            target: yCalc,
+            params: { N, T, p0, yCalc },
+            formula: '$$P_0 = \\frac{N}{(1+y)^T} \\implies y = \\left(\\frac{N}{P_0}\\right)^{1/T} - 1$$',
+            getSteps: (p) => [
+              `$y = \\left(\\frac{${p.N}}{${p.p0}}\\right)^{1/${p.T}} - 1$`,
+              `$= \\left(${(p.N / p.p0).toFixed(6)}\\right)^{1/${p.T}} - 1 = ${p.yCalc.toFixed(6)}$`,
+              `Soit environ $\\mathbf{${(p.yCalc * 100).toFixed(2)}\\%}$ → réponse attendue en décimal : $\\mathbf{${p.yCalc.toFixed(4)}}$`
+            ]
+          };
+        }
+      },
+      {
+        id: 5,
+        title: 'Q5 — Coupon (obligation au pair)',
+        answerKind: 'currency',
+        decimals: 0,
+        generate: () => {
+          const N = [500, 1000, 1000, 2000][Math.floor(Math.random() * 4)];
+          const yPct = Math.floor(Math.random() * 8) + 8;
+          const y = yPct / 100;
+          const p0 = N;
+          const C = y * N;
+          return {
+            text: `L’obligation A a une maturité de 2 ans, un nominal de <b>${N} €</b>, un coupon annuel versé une fois par an. Son prix actuel est <b>${p0} €</b> (au pair) et son YTM est de <b>${yPct} %</b> par an. Quel est le montant du coupon en € ?`,
+            target: C,
+            params: { N, p0, y, yPct, C },
+            formula: '$$\\text{Au pair : } P_0 = N \\implies \\text{taux coupon} = y \\implies C = y \\times N$$',
+            getSteps: (p) => [
+              `Obligation au pair ($P_0 = N$) : le taux de coupon égale le YTM.`,
+              `$C = y \\times N = ${p.yPct}\\% \\times ${p.N} = ${p.y} \\times ${p.N} = \\mathbf{${p.C.toFixed(0)}\\,€}$`,
+              `Vérification par actualisation : $P_0 = \\frac{C}{1+y} + \\frac{C+N}{(1+y)^2}$ avec $C = ${p.C.toFixed(0)}$ redonne bien ${p.N} €.`
+            ]
+          };
+        }
+      }
+    ];
+
+    let shuffledIndices = [];
+    let currentOrderIndex = 0;
+    let currentData = null;
+    let currentTemplate = null;
+    let timerInterval = null;
+    let timeLeft = QUIZ_META.timerSeconds;
+    let sessionCorrect = 0;
+    let sessionAttempts = 0;
+    let answeredThisQuestion = false;
+
+    function shuffleQuestions() {
+      shuffledIndices = questionTemplates.map((_, i) => i).sort(() => Math.random() - 0.5);
+      currentOrderIndex = 0;
+    }
+
+    function renderProgressDots() {
+      const bar = document.getElementById('progress-bar');
+      bar.innerHTML = '';
+      for (let i = 0; i < QUIZ_META.questionCount; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'h-2 flex-1 max-w-[4rem] rounded-full transition-colors ' +
+          (i === currentOrderIndex ? 'bg-teal-600' : i < currentOrderIndex ? 'bg-teal-300' : 'bg-slate-200');
+        bar.appendChild(dot);
+      }
+    }
+
+    function formatExpected(value, template) {
+      if (template.answerKind === 'decimal') return value.toFixed(template.decimals ?? 4) + ' (décimal)';
+      const d = template.decimals ?? 2;
+      return value.toFixed(d) + ' €';
+    }
+
+    function updateAnswerLabel(template) {
+      const label = document.getElementById('answer-label');
+      const hint = document.getElementById('answer-hint');
+      const input = document.getElementById('user-answer');
+      if (template.answerKind === 'decimal') {
+        label.textContent = 'Votre réponse (décimal) :';
+        hint.textContent = 'Exemple : pour 1,23 %, entrez 0,0123 (pas 1,23).';
+        hint.classList.remove('hidden');
+        input.placeholder = 'ex. 0,0137';
+      } else {
+        label.textContent = 'Votre réponse (€) :';
+        hint.classList.add('hidden');
+        input.placeholder = template.decimals === 0 ? 'ex. 1108' : 'ex. 109,59';
+      }
+    }
+
+    function isAnswerCorrect(userVal, expected, template) {
+      if (template.answerKind === 'decimal') {
+        return Math.abs(userVal - expected) < 0.00025 ||
+          (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.015);
+      }
+      const tol = template.decimals === 0 ? 0.5 : 0.05;
+      return Math.abs(userVal - expected) < tol ||
+        (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.01);
+    }
+
+    function typesetMath() {
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().catch(() => {});
+      }
+    }
+
+    function loadQuestion() {
+      clearInterval(timerInterval);
+      timeLeft = QUIZ_META.timerSeconds;
+      answeredThisQuestion = false;
+      updateTimerDisplay();
+      startTimer();
+
+      const templateIndex = shuffledIndices[currentOrderIndex];
+      currentTemplate = questionTemplates[templateIndex];
+      currentData = currentTemplate.generate();
+
+      document.getElementById('question-tag').innerText =
+        `${QUIZ_META.title} — Question ${currentOrderIndex + 1} / ${QUIZ_META.questionCount} · ${currentTemplate.title}`;
+      document.getElementById('question-text').innerHTML = currentData.text;
+      updateAnswerLabel(currentTemplate);
+
+      document.getElementById('user-answer').value = '';
+      const feedback = document.getElementById('feedback');
+      feedback.classList.add('hidden');
+      feedback.className = 'hidden text-sm font-semibold p-3 rounded-lg text-center';
+      document.getElementById('correction-box').classList.add('hidden');
+      renderProgressDots();
+      typesetMath();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          const feedback = document.getElementById('feedback');
+          feedback.innerText = '⏰ Temps écoulé — consultez la correction ci-dessous.';
+          feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block';
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      const timerEl = document.getElementById('timer');
+      timerEl.innerText = display;
+      timerEl.className = timeLeft <= 30
+        ? 'text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse'
+        : 'text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md';
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('score-display').textContent = `${sessionCorrect} / ${sessionAttempts}`;
+    }
+
+    function generateNewVariables() {
+      loadQuestion();
+    }
+
+    function nextQuestion() {
+      currentOrderIndex++;
+      if (currentOrderIndex >= questionTemplates.length) {
+        shuffleQuestions();
+      }
+      loadQuestion();
+    }
+
+    function checkAnswer() {
+      const userVal = parseFloat(document.getElementById('user-answer').value);
+      const feedback = document.getElementById('feedback');
+
+      if (isNaN(userVal)) {
+        feedback.innerText = 'Veuillez entrer un nombre valide.';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block';
+        return;
+      }
+
+      const expected = currentData.target;
+      const isCorrect = isAnswerCorrect(userVal, expected, currentTemplate);
+
+      if (!answeredThisQuestion) {
+        sessionAttempts++;
+        if (isCorrect) sessionCorrect++;
+        answeredThisQuestion = true;
+        updateScoreDisplay();
+      }
+
+      if (isCorrect) {
+        feedback.innerText = 'Correct — bravo !';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-emerald-100 text-emerald-800 block';
+      } else {
+        feedback.innerText = 'Réponse incorrecte. Réessayez ou affichez la correction.';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-rose-100 text-rose-800 block';
+      }
+    }
+
+    function revealCorrection() {
+      clearInterval(timerInterval);
+      document.getElementById('correction-formula').innerHTML = currentData.formula;
+      const steps = currentData.getSteps(currentData.params);
+      document.getElementById('correction-steps').innerHTML =
+        steps.map(step => `<p>• ${step}</p>`).join('');
+      document.getElementById('correction-expected').innerText =
+        'Réponse attendue : ' + formatExpected(currentData.target, currentTemplate);
+      document.getElementById('correction-box').classList.remove('hidden');
+      typesetMath();
+    }
+
+    window.onload = () => {
+      shuffleQuestions();
+      loadQuestion();
+      updateScoreDisplay();
+    };
+  </script>
+</body>
+</html>
