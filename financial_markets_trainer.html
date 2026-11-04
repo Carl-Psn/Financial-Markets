@@ -114,7 +114,7 @@
       </div>
       <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm">
         <h4 class="font-bold text-slate-700 uppercase text-xs">Step-by-Step Calculation</h4>
-        <div id="correction-steps" class="space-y-2 text-slate-700"></div>
+        <div id="correction-steps" class="space-y-3 text-slate-700"></div>
       </div>
       <p id="correction-expected" class="text-sm font-semibold text-emerald-800 bg-emerald-50 p-3 rounded-lg"></p>
     </div>
@@ -144,9 +144,9 @@
                 params: { d1, k, g },
                 formula: '$$V_0 = \\frac{D_1}{k - g}$$',
                 getSteps: (p) => [
-                  `Identify variables: $D_1 = ${p.d1}\\,€$, $k = ${(p.k * 100).toFixed(1)}\\% = ${p.k}$, $g = ${(p.g * 100).toFixed(1)}\\% = ${p.g}$`,
-                  `Denominator: $k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}$`,
-                  `Result: $V_0 = \\frac{${p.d1}}{${(p.k - p.g).toFixed(4)}} = \\mathbf{${(p.d1 / (p.k - p.g)).toFixed(2)}\\,€}$`
+                  { caption: 'Identify variables', latex: `D_1 = ${p.d1}\\text{ €},\\quad k = ${(p.k * 100).toFixed(1)}\\% = ${p.k},\\quad g = ${(p.g * 100).toFixed(1)}\\% = ${p.g}` },
+                  { caption: 'Denominator', latex: `k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}` },
+                  { caption: 'Result', latex: `V_0 = \\frac{${p.d1}}{${(p.k - p.g).toFixed(4)}} = \\mathbf{${(p.d1 / (p.k - p.g)).toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -166,9 +166,9 @@
                 params: { p0, k, g },
                 formula: '$$D_1 = P_0 \\times (k - g)$$',
                 getSteps: (p) => [
-                  `Identify variables: $P_0 = ${p.p0}\\,€$, $k = ${(p.k * 100).toFixed(1)}\\%$, $g = ${(p.g * 100).toFixed(1)}\\%$`,
-                  `Rate spread: $k - g = ${(p.k - p.g).toFixed(4)}$`,
-                  `Result: $D_1 = ${p.p0} \\times ${(p.k - p.g).toFixed(4)} = \\mathbf{${(p.p0 * (p.k - p.g)).toFixed(2)}\\,€}$`
+                  { caption: 'Identify variables', latex: `P_0 = ${p.p0}\\text{ €},\\quad k = ${(p.k * 100).toFixed(1)}\\%,\\quad g = ${(p.g * 100).toFixed(1)}\\%` },
+                  { caption: 'Rate spread', latex: `k - g = ${(p.k - p.g).toFixed(4)}` },
+                  { caption: 'Result', latex: `D_1 = ${p.p0} \\times ${(p.k - p.g).toFixed(4)} = \\mathbf{${(p.p0 * (p.k - p.g)).toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -192,9 +192,9 @@
                 params: { beta, e_rm, rf, e1, p0, k, p0_no_growth },
                 formula: '$$k = r_f + \\beta \\times (E(r_M) - r_f) \\quad ; \\quad PVGO_0 = P_0 - \\frac{E_1}{k}$$',
                 getSteps: (p) => [
-                  `Required return (CAPM): $k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%$`,
-                  `No-growth value: $\\frac{E_1}{k} = \\frac{${p.e1}}{${p.k.toFixed(4)}} = ${p.p0_no_growth.toFixed(2)}\\,€$`,
-                  `PVGO: $PVGO_0 = ${p.p0} - ${p.p0_no_growth.toFixed(2)} = \\mathbf{${(p.p0 - p.p0_no_growth).toFixed(2)}\\,€}$`
+                  { caption: 'Required return (CAPM)', latex: `k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%` },
+                  { caption: 'No-growth value', latex: `\\frac{E_1}{k} = \\frac{${p.e1}}{${p.k.toFixed(4)}} = ${p.p0_no_growth.toFixed(2)}\\text{ €}` },
+                  { caption: 'PVGO', latex: `PVGO_0 = ${p.p0} - ${p.p0_no_growth.toFixed(2)} = \\mathbf{${(p.p0 - p.p0_no_growth).toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -217,10 +217,10 @@
                 params: { rf, beta, e_rm, d_reg, d_spec, k, p1 },
                 formula: '$$P_1 = \\frac{D_{\\text{regular}}}{k} + \\frac{D_{\\text{special}}}{1 + k}$$',
                 getSteps: (p) => [
-                  `$k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%$`,
-                  `Regular perpetuity at t=1: $\\frac{${p.d_reg}}{${p.k.toFixed(4)}} = ${(p.d_reg / p.k).toFixed(2)}$`,
-                  `Special dividend discounted from t=2 to t=1: $\\frac{${p.d_spec}}{1 + ${p.k.toFixed(4)}} = ${(p.d_spec / (1 + p.k)).toFixed(2)}$`,
-                  `$P_1 = ${(p.d_reg / p.k).toFixed(2)} + ${(p.d_spec / (1 + p.k)).toFixed(2)} = \\mathbf{${p.p1.toFixed(2)}\\,€}$`
+                  { caption: 'Required return k', latex: `k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%` },
+                  { caption: 'Regular perpetuity at t = 1', latex: `\\frac{${p.d_reg}}{${p.k.toFixed(4)}} = ${(p.d_reg / p.k).toFixed(2)}` },
+                  { caption: 'Special dividend (t = 2 → t = 1)', latex: `\\frac{${p.d_spec}}{1 + ${p.k.toFixed(4)}} = ${(p.d_spec / (1 + p.k)).toFixed(2)}` },
+                  { caption: 'Stock price at t = 1', latex: `P_1 = ${(p.d_reg / p.k).toFixed(2)} + ${(p.d_spec / (1 + p.k)).toFixed(2)} = \\mathbf{${p.p1.toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -239,8 +239,8 @@
                 params: { d1, k, delta_p0 },
                 formula: '$$\\Delta P_0 = - \\frac{D_1}{1 + k}$$',
                 getSteps: (p) => [
-                  `The skipped dividend at t=1 equals present value lost, discounted back to t=0.`,
-                  `$\\Delta P_0 = - \\frac{${p.d1}}{1 + ${p.k}} = \\mathbf{${p.delta_p0.toFixed(2)}\\,€}$`
+                  { caption: 'The skipped dividend at t = 1 is the present value lost, discounted to t = 0' },
+                  { caption: 'Price change', latex: `\\Delta P_0 = - \\frac{${p.d1}}{1 + ${p.k}} = \\mathbf{${p.delta_p0.toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -272,9 +272,9 @@
                 params: { N, T, y, yPct, p0, denom },
                 formula: '$$P_0 = \\frac{N}{(1+y)^T}$$',
                 getSteps: (p) => [
-                  `Given: $N = ${p.N}\\,€$, $T = ${p.T}$, $y = ${p.yPct}\\% = ${p.y}$`,
-                  `$(1+y)^T = (1 + ${p.y})^{${p.T}} = ${p.denom.toFixed(5)}$`,
-                  `$P_0 = \\frac{${p.N}}{${p.denom.toFixed(5)}} = \\mathbf{${p.p0.toFixed(2)}\\,€}$`
+                  { caption: 'Given', latex: `N = ${p.N}\\text{ €},\\quad T = ${p.T},\\quad y = ${p.yPct}\\% = ${p.y}` },
+                  { caption: 'Discount factor', latex: `(1+y)^T = (1 + ${p.y})^{${p.T}} = ${p.denom.toFixed(5)}` },
+                  { caption: 'Result', latex: `P_0 = \\frac{${p.N}}{${p.denom.toFixed(5)}} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -301,10 +301,10 @@
                 params: { r1, r2, r1Pct, r2Pct, N, C, couponPct, p0, term1, term2 },
                 formula: '$$P_0 = \\frac{C}{1+r_1} + \\frac{C+N}{(1+r_2)^2}$$',
                 getSteps: (p) => [
-                  `Coupon: $C = ${p.couponPct}\\% \\times ${p.N} = ${p.C}\\,€$; cash flow at t=2: $C+N = ${(p.C + p.N).toFixed(2)}\\,€$`,
-                  `$\\frac{C}{1+r_1} = \\frac{${p.C}}{${(1 + p.r1).toFixed(2)}} = ${p.term1.toFixed(6)}$`,
-                  `$\\frac{C+N}{(1+r_2)^2} = \\frac{${p.C + p.N}}{${Math.pow(1 + p.r2, 2).toFixed(4)}} = ${p.term2.toFixed(6)}$`,
-                  `$P_0 = ${p.term1.toFixed(2)} + ${p.term2.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}\\,€}$`
+                  { caption: 'Coupon and cash flows', latex: `C = ${p.couponPct}\\% \\times ${p.N} = ${p.C}\\text{ €},\\quad C+N \\text{ at } t=2 = ${(p.C + p.N).toFixed(2)}\\text{ €}` },
+                  { caption: 'Discount coupon at t = 1', latex: `\\frac{C}{1+r_1} = \\frac{${p.C}}{${(1 + p.r1).toFixed(2)}} = ${p.term1.toFixed(6)}` },
+                  { caption: 'Discount principal + coupon at t = 2', latex: `\\frac{C+N}{(1+r_2)^2} = \\frac{${p.C + p.N}}{${Math.pow(1 + p.r2, 2).toFixed(4)}} = ${p.term2.toFixed(6)}` },
+                  { caption: 'Result', latex: `P_0 = ${p.term1.toFixed(2)} + ${p.term2.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
                 ]
               };
             }
@@ -334,10 +334,10 @@
                 params: { face, pA, pB, N_C, couponPct, cf1, cf2, unitsA, unitsB, pC },
                 formula: '$$P_C = (\\text{units of A} \\times P_A) + (\\text{units of B} \\times P_B)$$',
                 getSteps: (p) => [
-                  `Bond C cash flows: $CF_1 = ${p.cf1}\\,€$, $CF_2 = ${p.cf2}\\,€$`,
-                  `Replication: ${p.unitsA} unit(s) of A for t=1, ${p.unitsB} unit(s) of B for t=2`,
-                  `$P_C = ${p.unitsA} \\times ${p.pA} + ${p.unitsB} \\times ${p.pB} = \\mathbf{${p.pC.toFixed(0)}\\,€}$`,
-                  `Discount factors: $d_1 = P_A/N = ${(p.pA / p.face).toFixed(2)}$, $d_2 = P_B/N = ${(p.pB / p.face).toFixed(2)}$`
+                  { caption: 'Bond C cash flows', latex: `CF_1 = ${p.cf1}\\text{ €},\\quad CF_2 = ${p.cf2}\\text{ €}` },
+                  { caption: 'Replication portfolio', latex: `${p.unitsA} \\times \\text{Bond A (}t=1\\text{)},\\quad ${p.unitsB} \\times \\text{Bond B (}t=2\\text{)}` },
+                  { caption: 'No-arbitrage price', latex: `P_C = ${p.unitsA} \\times ${p.pA} + ${p.unitsB} \\times ${p.pB} = \\mathbf{${p.pC.toFixed(0)}\\text{ €}}` },
+                  { caption: 'Discount factors (check)', latex: `d_1 = \\frac{P_A}{N} = ${(p.pA / p.face).toFixed(2)},\\quad d_2 = \\frac{P_B}{N} = ${(p.pB / p.face).toFixed(2)}` }
                 ]
               };
             }
@@ -360,8 +360,8 @@
                 params: { N, T, p0, yCalc },
                 formula: '$$P_0 = \\frac{N}{(1+y)^T} \\implies y = \\left(\\frac{N}{P_0}\\right)^{1/T} - 1$$',
                 getSteps: (p) => [
-                  `$y = \\left(\\frac{${p.N}}{${p.p0}}\\right)^{1/${p.T}} - 1 = ${p.yCalc.toFixed(6)}$`,
-                  `Approximately $\\mathbf{${(p.yCalc * 100).toFixed(2)}\\%}$ → enter $\\mathbf{${p.yCalc.toFixed(4)}}$ as a decimal`
+                  { caption: 'Yield-to-maturity', latex: `y = \\left(\\frac{${p.N}}{${p.p0}}\\right)^{1/${p.T}} - 1 = ${p.yCalc.toFixed(6)}` },
+                  { caption: 'Answer format', latex: `${(p.yCalc * 100).toFixed(2)}\\% \\;\\Rightarrow\\; \\text{enter } \\mathbf{${p.yCalc.toFixed(4)}} \\text{ as a decimal}` }
                 ]
               };
             }
@@ -383,8 +383,8 @@
                 params: { N, p0, y, yPct, C },
                 formula: '$$\\text{At par: } P_0 = N \\implies \\text{coupon rate} = y \\implies C = y \\times N$$',
                 getSteps: (p) => [
-                  `Bond trades at par ($P_0 = N$), so coupon rate equals YTM.`,
-                  `$C = y \\times N = ${p.yPct}\\% \\times ${p.N} = \\mathbf{${p.C.toFixed(0)}\\,€}$`
+                  { caption: 'At par, coupon rate equals yield-to-maturity (P0 = N)' },
+                  { caption: 'Coupon payment', latex: `C = y \\times N = ${p.yPct}\\% \\times ${p.N} = \\mathbf{${p.C.toFixed(0)}\\text{ €}}` }
                 ]
               };
             }
@@ -395,6 +395,32 @@
 
     let activeQuizId = 'mock-quiz-2';
     let timerInterval = null;
+
+    /** Render LaTeX like the reference formula bar (display math, centered). */
+    function wrapDisplayMath(latex) {
+      return `<div class="text-center overflow-x-auto py-2 text-base">${latex}</div>`;
+    }
+
+    function stripDisplayDelimiters(formulaStr) {
+      return formulaStr.replace(/^\$\$|\$\$$/g, '').trim();
+    }
+
+    function renderFormulaHtml(formulaStr) {
+      return wrapDisplayMath('$$' + stripDisplayDelimiters(formulaStr) + '$$');
+    }
+
+    /** Steps: { caption?: string, latex?: string } — latex typeset with $$ like the cheat sheet. */
+    function renderCorrectionSteps(steps) {
+      return steps.map((step) => {
+        const caption = step.caption
+          ? `<p class="text-xs font-semibold text-slate-500 mb-1">${step.caption}</p>`
+          : '';
+        const math = step.latex
+          ? wrapDisplayMath('$$' + step.latex + '$$')
+          : '';
+        return `<div class="correction-step space-y-1 pb-3 border-b border-slate-200 last:border-0 last:pb-0">${caption}${math}</div>`;
+      }).join('');
+    }
 
     const quizRuntime = {};
 
@@ -524,9 +550,10 @@
         (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.01);
     }
 
-    function typesetMath() {
+    function typesetMath(elements) {
       if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise().catch(() => {});
+        const targets = elements || undefined;
+        MathJax.typesetPromise(targets).catch(() => {});
       }
     }
 
@@ -666,14 +693,14 @@
     function revealCorrection() {
       clearInterval(timerInterval);
       const state = getState();
-      document.getElementById('correction-formula').innerHTML = state.currentData.formula;
+      document.getElementById('correction-formula').innerHTML =
+        renderFormulaHtml(state.currentData.formula);
       const steps = state.currentData.getSteps(state.currentData.params);
-      document.getElementById('correction-steps').innerHTML =
-        steps.map(step => `<p>• ${step}</p>`).join('');
+      document.getElementById('correction-steps').innerHTML = renderCorrectionSteps(steps);
       document.getElementById('correction-expected').innerText =
         'Expected answer: ' + formatExpected(state.currentData.target, state.currentTemplate);
       document.getElementById('correction-box').classList.remove('hidden');
-      typesetMath();
+      typesetMath([document.getElementById('correction-box')]);
     }
 
     window.onload = () => {
