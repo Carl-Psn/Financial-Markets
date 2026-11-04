@@ -139,6 +139,13 @@
   </main>
 
   <script>
+    /*
+     * Question wording (text: `...` in templates below):
+     * - Inline math: \\( r_1 = 2\\% \\)  — matches MathJax inline delimiters in <head>.
+     * - Avoid $...$ or $$...$$ in questions: $$ is display math and starts a new line;
+     *   lone $ pairs often break layout before the next <b> value </b>.
+     * - Or skip TeX: r<sub>1</sub> = <b>2%</b> (no MathJax, stays on one line).
+     */
     const QUIZZES = {
       'mock-quiz-2': {
         id: 'mock-quiz-2',
@@ -314,7 +321,7 @@
               const term1 = C / (1 + r1);
               const term2 = (C + N) / Math.pow(1 + r2, 2);
               return {
-                text: `As of today, the 1-year risk-free interest rate is $r_1 =$ <b>${r1Pct}%</b> and the 2-year risk-free rate is $r_2 =$ <b>${r2Pct}%</b>. What is the price of a default-risk-free bond B with maturity <b>2 years</b>, face value <b>${N} €</b>, and annual coupon rate <b>${couponPct}%</b> (one coupon per year)? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                text: `As of today, the 1-year risk-free interest rate is \\(r_1 = ${r1Pct}\\%\\) and the 2-year risk-free rate is \\(r_2 = ${r2Pct}\\%\\). What is the price of a default-risk-free bond B with maturity <b>2 years</b>, face value <b>${N} €</b>, and annual coupon rate <b>${couponPct}%</b> (one coupon per year)? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
                 target: p0,
                 params: { r1, r2, r1Pct, r2Pct, N, C, couponPct, p0, term1, term2 },
                 formula: '$$P_0 = \\frac{C}{1+r_1} + \\frac{C+N}{(1+r_2)^2}$$',
