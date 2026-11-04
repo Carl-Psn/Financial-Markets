@@ -13,63 +13,81 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    .formula-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+    }
+    .formula-scroll mjx-container {
+      margin: 0 auto !important;
+    }
+    @media (max-width: 639px) {
+      mjx-container[jax="CHTML"][display="true"] {
+        font-size: 95% !important;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4 md:p-6">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center px-2 py-3 sm:p-4 md:p-6">
 
-  <nav class="w-full max-w-4xl mb-4" role="tablist" aria-label="Mock quizzes">
-    <div class="flex rounded-xl bg-white shadow-sm border border-slate-200 p-1 gap-1">
+  <nav class="w-full max-w-4xl mb-3 sm:mb-4" role="tablist" aria-label="Mock quizzes">
+    <div class="flex flex-col sm:flex-row rounded-xl bg-white shadow-sm border border-slate-200 p-1 gap-1">
       <button type="button" role="tab" id="tab-quiz-2" aria-selected="true" aria-controls="panel-quiz"
               onclick="switchQuiz('mock-quiz-2')"
-              class="quiz-tab flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg transition">
-        Mock Quiz 2 — Equities
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug">
+        <span class="sm:hidden">Mock Quiz 2 · Equities</span>
+        <span class="hidden sm:inline">Mock Quiz 2 — Equities</span>
       </button>
       <button type="button" role="tab" id="tab-quiz-3" aria-selected="false" aria-controls="panel-quiz"
               onclick="switchQuiz('mock-quiz-3')"
-              class="quiz-tab flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg transition text-slate-600 hover:bg-slate-50">
-        Mock Quiz 3 — Bonds
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 3 · Bonds</span>
+        <span class="hidden sm:inline">Mock Quiz 3 — Bonds</span>
       </button>
     </div>
-    <p class="text-xs text-slate-500 mt-2 text-center">Switch quizzes using the tabs above (single page — ready for Google Sites embed).</p>
+    <p class="hidden sm:block text-xs text-slate-500 mt-2 text-center">Switch quizzes using the tabs above (single page — ready for Google Sites embed).</p>
   </nav>
 
-  <header id="header-quiz-2" class="w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-4 border-t-4 border-indigo-600">
-    <h1 class="text-lg font-bold text-slate-800 text-center mb-1">Mock Quiz 2 — Stocks &amp; Dividends</h1>
-    <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2 text-center">Reference Formulas</h2>
-    <div class="text-center text-sm md:text-base text-slate-700 overflow-x-auto py-2 flex flex-wrap justify-around gap-4">
+  <header id="header-quiz-2" class="w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-indigo-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 2 — Stocks &amp; Dividends</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 flex flex-col sm:flex-row sm:flex-wrap justify-around gap-3 sm:gap-4">
       <div>$$k_i = r_f + \beta_i \times (E(r_M) - r_f)$$</div>
       <div>$$V_0 = \frac{D_1}{k - g} = \frac{(1 - b) \times E_1}{k - b \times ROE^{\text{NewProjects}}}$$</div>
       <div>$$P_0 = \frac{E_1}{k} + PVGO_0$$</div>
     </div>
   </header>
 
-  <header id="header-quiz-3" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-4 border-t-4 border-teal-600">
-    <h1 class="text-lg font-bold text-slate-800 text-center mb-1">Mock Quiz 3 — Bonds &amp; Interest Rates</h1>
-    <h2 class="text-xs font-bold uppercase tracking-wider text-teal-600 mb-2 text-center">Reference Formulas</h2>
-    <div class="text-center text-sm md:text-base text-slate-700 overflow-x-auto py-2 space-y-3">
+  <header id="header-quiz-3" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-teal-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 3 — Bonds &amp; Interest Rates</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-teal-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
       <div>$$P_0 = \frac{C}{1+y} + \cdots + \frac{C+N}{(1+y)^T} = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{yield-to-maturity}$$</div>
       <div>$$P_0 = \frac{C}{1+r_1} + \frac{C+N}{(1+r_2)^2} + \cdots, \quad r_t = \text{t-year spot rate}$$</div>
     </div>
   </header>
 
-  <main id="panel-quiz" role="tabpanel" class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-6 md:p-8 flex flex-col gap-6">
+  <main id="panel-quiz" role="tabpanel" class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
 
-    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-      <div class="flex flex-wrap items-center gap-4">
-        <div class="flex items-center gap-3">
-          <span class="text-xs uppercase font-semibold text-slate-500">Timer</span>
-          <div id="timer" class="text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md" role="timer" aria-live="polite">03:00</div>
+    <div class="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-3 sm:justify-start sm:gap-4 w-full sm:w-auto">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <span class="text-[10px] sm:text-xs uppercase font-semibold text-slate-500">Timer</span>
+          <div id="timer" class="text-xl sm:text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md" role="timer" aria-live="polite">03:00</div>
         </div>
-        <div class="text-xs text-slate-600">
+        <div class="text-[10px] sm:text-xs text-slate-600">
           Session score: <span id="score-display" class="font-bold">0 / 0</span>
         </div>
       </div>
-      <div class="flex gap-2">
+      <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <button type="button" id="btn-random-vars" onclick="generateNewVariables()"
-                class="theme-btn-secondary px-3 py-2 text-xs font-semibold rounded-lg border transition">
+                class="theme-btn-secondary w-full sm:w-auto min-h-[44px] px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg border transition">
           New Variables
         </button>
         <button type="button" id="btn-next" onclick="nextQuestion()"
-                class="px-3 py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
+                class="w-full sm:w-auto min-h-[44px] px-3 py-2.5 sm:py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
           Next Question →
         </button>
       </div>
@@ -78,21 +96,21 @@
     <div id="progress-bar" class="flex gap-1.5 justify-center" aria-hidden="true"></div>
 
     <div class="space-y-3">
-      <span id="question-tag" class="inline-block text-xs font-bold tracking-wide uppercase px-2.5 py-1 rounded-full">
+      <span id="question-tag" class="inline-block max-w-full text-[10px] sm:text-xs font-bold tracking-wide uppercase px-2 sm:px-2.5 py-1 rounded-full break-words">
         Question 1 / 5
       </span>
-      <div id="question-text" class="text-slate-700 leading-relaxed text-base md:text-lg min-h-[80px]"></div>
+      <div id="question-text" class="text-slate-700 leading-relaxed text-sm sm:text-base md:text-lg min-h-[64px] sm:min-h-[80px] break-words"></div>
     </div>
 
-    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-      <label for="user-answer" id="answer-label" class="block text-xs font-bold uppercase text-slate-600">Your Answer (€):</label>
-      <p id="answer-hint" class="text-xs text-slate-500 hidden"></p>
-      <div class="flex gap-2">
+    <div class="space-y-3 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200">
+      <label for="user-answer" id="answer-label" class="block text-[10px] sm:text-xs font-bold uppercase text-slate-600">Your Answer (€):</label>
+      <p id="answer-hint" class="text-[11px] sm:text-xs text-slate-500 leading-snug hidden"></p>
+      <div class="flex flex-col sm:flex-row gap-2">
         <input type="number" step="any" id="user-answer" placeholder="e.g. 445.45" onkeydown="if(event.key==='Enter') checkAnswer()"
-               class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:outline-none text-lg theme-input-ring"
+               class="flex-1 min-w-0 w-full border border-slate-300 rounded-lg px-4 py-3 sm:py-2 focus:ring-2 focus:outline-none text-base sm:text-lg theme-input-ring"
                autocomplete="off" inputmode="decimal">
         <button type="button" id="btn-validate" onclick="checkAnswer()"
-                class="theme-btn-primary text-white font-semibold px-6 py-2 rounded-lg transition">
+                class="theme-btn-primary w-full sm:w-auto min-h-[44px] text-white font-semibold px-6 py-3 sm:py-2 rounded-lg transition shrink-0">
           Validate
         </button>
       </div>
@@ -101,18 +119,18 @@
 
     <div class="flex justify-between items-center pt-2">
       <button type="button" id="btn-reveal" onclick="revealCorrection()"
-              class="theme-link text-sm font-semibold underline">
+              class="theme-link text-left text-xs sm:text-sm font-semibold underline min-h-[44px] sm:min-h-0 py-2 sm:py-0">
         Show Detailed Correction
       </button>
     </div>
 
     <div id="correction-box" class="hidden border-t-2 pt-4 space-y-4 theme-correction-border">
       <h3 class="text-md font-bold text-slate-800">Detailed Solution</h3>
-      <div class="space-y-2 p-4 rounded-lg border text-sm theme-correction-formula">
+      <div class="space-y-2 p-3 sm:p-4 rounded-lg border text-xs sm:text-sm theme-correction-formula">
         <h4 class="font-bold uppercase text-xs">Generic Formula</h4>
         <div id="correction-formula" class="text-slate-800 font-medium py-1"></div>
       </div>
-      <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm">
+      <div class="space-y-2 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200 text-xs sm:text-sm">
         <h4 class="font-bold text-slate-700 uppercase text-xs">Step-by-Step Calculation</h4>
         <div id="correction-steps" class="space-y-3 text-slate-700"></div>
       </div>
@@ -398,7 +416,7 @@
 
     /** Render LaTeX like the reference formula bar (display math, centered). */
     function wrapDisplayMath(latex) {
-      return `<div class="text-center overflow-x-auto py-2 text-base">${latex}</div>`;
+      return `<div class="formula-scroll text-center py-2 text-xs sm:text-sm md:text-base">${latex}</div>`;
     }
 
     function stripDisplayDelimiters(formulaStr) {
@@ -454,32 +472,43 @@
       state.currentOrderIndex = 0;
     }
 
+    const UI = {
+      tabBase: 'quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug',
+      btnSecondary: 'theme-btn-secondary w-full sm:w-auto min-h-[44px] px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg border transition',
+      btnValidate: 'theme-btn-primary w-full sm:w-auto min-h-[44px] text-white font-semibold px-6 py-3 sm:py-2 rounded-lg transition shrink-0',
+      btnReveal: 'theme-link text-left text-xs sm:text-sm font-semibold underline min-h-[44px] sm:min-h-0 py-2 sm:py-0',
+      input: 'flex-1 min-w-0 w-full border border-slate-300 rounded-lg px-4 py-3 sm:py-2 focus:ring-2 focus:outline-none text-base sm:text-lg theme-input-ring',
+      questionTag: 'inline-block max-w-full text-[10px] sm:text-xs font-bold tracking-wide uppercase px-2 sm:px-2.5 py-1 rounded-full break-words',
+      timerOk: 'text-xl sm:text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md',
+      timerLow: 'text-xl sm:text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse'
+    };
+
     function applyTheme(theme) {
       const isIndigo = theme === 'indigo';
       const scoreEl = document.getElementById('score-display');
       scoreEl.className = isIndigo ? 'font-bold text-indigo-700' : 'font-bold text-teal-700';
 
       document.querySelectorAll('.theme-btn-secondary').forEach(el => {
-        el.className = 'theme-btn-secondary px-3 py-2 text-xs font-semibold rounded-lg border transition ' +
+        el.className = UI.btnSecondary + ' ' +
           (isIndigo
             ? 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100'
             : 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100');
       });
       document.getElementById('btn-validate').className =
-        'theme-btn-primary text-white font-semibold px-6 py-2 rounded-lg transition ' +
+        UI.btnValidate + ' ' +
         (isIndigo ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-teal-600 hover:bg-teal-700');
       document.getElementById('btn-reveal').className =
-        'theme-link text-sm font-semibold underline ' +
+        UI.btnReveal + ' ' +
         (isIndigo ? 'text-indigo-600 hover:text-indigo-800' : 'text-teal-700 hover:text-teal-900');
       document.getElementById('user-answer').className =
-        'flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:outline-none text-lg theme-input-ring ' +
+        UI.input + ' ' +
         (isIndigo ? 'focus:ring-indigo-500' : 'focus:ring-teal-500');
 
       const correctionBox = document.getElementById('correction-box');
       correctionBox.className = 'hidden border-t-2 pt-4 space-y-4 theme-correction-border ' +
         (isIndigo ? 'border-indigo-100' : 'border-teal-100');
       document.querySelector('.theme-correction-formula').className =
-        'space-y-2 p-4 rounded-lg border text-sm theme-correction-formula ' +
+        'space-y-2 p-3 sm:p-4 rounded-lg border text-xs sm:text-sm theme-correction-formula ' +
         (isIndigo ? 'bg-indigo-50/50 border-indigo-100' : 'bg-teal-50/50 border-teal-100');
     }
 
@@ -489,10 +518,10 @@
         const active = id === activeQuizId;
         tab.setAttribute('aria-selected', active ? 'true' : 'false');
         if (active) {
-          tab.className = 'quiz-tab flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg transition shadow-sm ' +
+          tab.className = UI.tabBase + ' shadow-sm ' +
             (id === 'mock-quiz-2' ? 'bg-indigo-600 text-white' : 'bg-teal-600 text-white');
         } else {
-          tab.className = 'quiz-tab flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg transition text-slate-600 hover:bg-slate-50';
+          tab.className = UI.tabBase + ' text-slate-600 hover:bg-slate-50';
         }
       });
       document.getElementById('header-quiz-2').classList.toggle('hidden', activeQuizId !== 'mock-quiz-2');
@@ -506,7 +535,7 @@
       bar.innerHTML = '';
       for (let i = 0; i < quiz.questionCount; i++) {
         const dot = document.createElement('span');
-        dot.className = 'h-2 flex-1 max-w-[4rem] rounded-full transition-colors ' +
+        dot.className = 'h-1.5 sm:h-2 flex-1 max-w-[2rem] sm:max-w-[4rem] rounded-full transition-colors ' +
           (i === state.currentOrderIndex ? activeClass : i < state.currentOrderIndex ? doneClass : 'bg-slate-200');
         bar.appendChild(dot);
       }
@@ -562,7 +591,7 @@
       document.getElementById('question-tag').innerText =
         `${quiz.title} — Question ${state.currentOrderIndex + 1} / ${quiz.questionCount} · ${state.currentTemplate.title}`;
       document.getElementById('question-tag').className =
-        'inline-block text-xs font-bold tracking-wide uppercase px-2.5 py-1 rounded-full ' +
+        UI.questionTag + ' ' +
         (quiz.theme === 'indigo' ? 'bg-indigo-100 text-indigo-700' : 'bg-teal-100 text-teal-800');
       document.getElementById('question-text').innerHTML = state.currentData.text;
       updateAnswerLabel(state.currentTemplate);
@@ -621,9 +650,7 @@
       document.getElementById('timer').innerText =
         `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       const timerEl = document.getElementById('timer');
-      timerEl.className = state.timeLeft <= 30
-        ? 'text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse'
-        : 'text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md';
+      timerEl.className = state.timeLeft <= 30 ? UI.timerLow : UI.timerOk;
     }
 
     function updateScoreDisplay(state) {
