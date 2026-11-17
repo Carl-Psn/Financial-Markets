@@ -104,6 +104,25 @@
         <div>$$\text{Payoff}_{\text{short}} = \text{Number of contracts} \times \text{Contract size} \times (F_{0,T} - S_T)$$</div>
       </div>
     </div>
+    <div class="mt-4 pt-4 border-t border-amber-100">
+      <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-700 mb-2 text-center">Python Fast Solver (decimals)</h2>
+      <p class="text-[11px] sm:text-xs text-slate-600 text-center mb-3 leading-relaxed">Copy or download the script below, then paste it into a Python-capable calculator or IDE (e.g. NumWorks script, Pyscript, Thonny).</p>
+      <div class="flex flex-col sm:flex-row gap-2 justify-center mb-3">
+        <button type="button" id="btn-mock5-copy-solver" onclick="copyMock5Solver()"
+                class="min-h-[44px] px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition">
+          Copy Python script
+        </button>
+        <button type="button" id="btn-mock5-download-solver" onclick="downloadMock5Solver()"
+                class="min-h-[44px] px-4 py-2 text-xs font-semibold rounded-lg bg-white text-amber-900 border border-amber-300 hover:bg-amber-50 transition">
+          Download .py file
+        </button>
+      </div>
+      <p id="mock5-solver-copy-feedback" class="hidden text-center text-xs font-semibold text-emerald-700 mb-2">Copied to clipboard.</p>
+      <details class="rounded-lg border border-amber-200 bg-amber-50/40 text-left">
+        <summary class="cursor-pointer px-3 py-2 text-xs font-semibold text-amber-900 select-none min-h-[44px] flex items-center">Preview script source</summary>
+        <pre id="mock5-solver-preview" class="text-[10px] sm:text-xs leading-snug overflow-x-auto p-3 pt-0 text-slate-800 max-h-48 sm:max-h-64 border-t border-amber-200"></pre>
+      </details>
+    </div>
   </header>
 
   <main id="panel-quiz" role="tabpanel" class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
@@ -1130,7 +1149,172 @@
       typesetMath([document.getElementById('correction-box')]);
     }
 
+    const MOCK5_PYTHON_SOLVER = `# Fin Markets Fast Solver (Tout en decimal) - Mock 5
+
+
+def q1():
+    print("\\n--- Q1 : HPR 1-an Zero-Coupon ---")
+    t = float(input("T initial (ex: 15) : "))
+    y0 = float(input("y0 (ex: 0.037) : "))
+    y1 = float(input("y1 (ex: 0.011) : "))
+
+    hpr = (((1 + y0) ** t) / ((1 + y1) ** (t - 1))) - 1
+
+    print("----------------------")
+    print("HPR =", round(hpr, 4))
+
+
+def q2():
+    print("\\n--- Q2 : Spot r_T via Forward ---")
+    t = float(input("Date t (ex: 4) : "))
+    rt = float(input("Spot r_t (ex: 0.043) : "))
+    dt = float(input("Duree fwd (ex: 1) : "))
+    f = float(input("Fwd f (ex: 0.084) : "))
+
+    t_big = t + dt
+    r_big = (((1 + rt) ** t) * ((1 + f) ** dt)) ** (1 / t_big) - 1
+
+    print("----------------------")
+    print("r_" + str(int(t_big)) + " =", round(r_big, 4))
+
+
+def q3():
+    print("\\n--- Q3 : No-Arbitrage (Meme Rating) ---")
+    n1 = float(input("Nominal ZC1 (t=2) : "))
+    n2 = float(input("Nominal Oblig2 (t=2) : "))
+    c2_rate = float(input("Taux coupon 2 (ex: 1.0) : "))
+    p2 = float(input("Prix Oblig2 : "))
+    n3 = float(input("Nominal ZC3 (t=1) : "))
+    p3 = float(input("Prix ZC3 : "))
+
+    c2 = n2 * c2_rate
+    # Replication t=2 : w2 * (c2 + n2) = n1
+    w2 = n1 / (c2 + n2)
+    # Replication t=1 : w2 * c2 + w3 * n3 = 0
+    w3 = -(w2 * c2) / n3
+
+    p1 = (w2 * p2) + (w3 * p3)
+
+    print("----------------------")
+    print("w2 =", round(w2, 4), "| w3 =", round(w3, 4))
+    print("Prix =", round(p1, 2))
+
+
+def q4():
+    print("\\n--- Q4 : Forward f(t -> t+1) ---")
+    t = float(input("Date t (ex: 4) : "))
+    rt = float(input("Spot r_t (ex: 0.035) : "))
+    bps = float(input("Ecart bps (ex: 25) : "))
+
+    rt1 = rt + (bps / 10000.0)
+    f = (((1 + rt1) ** (t + 1)) / ((1 + rt) ** t)) - 1
+
+    print("----------------------")
+    print("r_" + str(int(t + 1)) + " =", round(rt1, 6))
+    print("f =", round(f, 4))
+
+
+def q5():
+    print("\\n--- Q5 : Payoff Forward ---")
+    sens = input("Position (L=Long / S=Short) : ").upper()
+    nb = float(input("Nb contrats (ex: 58) : "))
+    taille = float(input("Taille contrat (ex: 197) : "))
+    f0 = float(input("Prix Fwd F0 (ex: 41) : "))
+    st = float(input("Prix Spot ST (ex: 48) : "))
+
+    if sens == "L":
+        payoff = nb * taille * (st - f0)
+    else:
+        payoff = nb * taille * (f0 - st)
+
+    print("----------------------")
+    print("Payoff =", int(round(payoff, 0)))
+
+
+def main():
+    while True:
+        print("\\n=== FIN SOLVER (MOCK 5) ===")
+        print("1: HPR 1-an Zero-Coupon")
+        print("2: Spot r_T depuis Fwd")
+        print("3: Prix No-Arbitrage (Rating)")
+        print("4: Forward f(t->t+1) + bps")
+        print("5: Payoff Contrat Forward")
+        print("0: Quitter")
+
+        choix = input("Q# (0-5) : ")
+        if choix == "1":
+            q1()
+        elif choix == "2":
+            q2()
+        elif choix == "3":
+            q3()
+        elif choix == "4":
+            q4()
+        elif choix == "5":
+            q5()
+        elif choix == "0":
+            break
+
+
+main()
+`;
+
+    function initMock5SolverPreview() {
+      const pre = document.getElementById('mock5-solver-preview');
+      if (pre) pre.textContent = MOCK5_PYTHON_SOLVER;
+    }
+
+    function showMock5SolverCopyFeedback(message, isError) {
+      const el = document.getElementById('mock5-solver-copy-feedback');
+      if (!el) return;
+      el.textContent = message;
+      el.className = isError
+        ? 'text-center text-xs font-semibold text-rose-700 mb-2'
+        : 'text-center text-xs font-semibold text-emerald-700 mb-2';
+      el.classList.remove('hidden');
+      clearTimeout(showMock5SolverCopyFeedback._timer);
+      showMock5SolverCopyFeedback._timer = setTimeout(() => el.classList.add('hidden'), 2800);
+    }
+
+    function copyMock5Solver() {
+      const done = () => showMock5SolverCopyFeedback('Copied to clipboard.', false);
+      const fail = () => {
+        showMock5SolverCopyFeedback('Copy failed — use Preview script source or Download .py.', true);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(MOCK5_PYTHON_SOLVER).then(done).catch(fail);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = MOCK5_PYTHON_SOLVER;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy') ? done() : fail();
+        } catch (e) {
+          fail();
+        }
+        document.body.removeChild(ta);
+      }
+    }
+
+    function downloadMock5Solver() {
+      const blob = new Blob([MOCK5_PYTHON_SOLVER], { type: 'text/x-python;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'fin_markets_mock5_solver.py';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showMock5SolverCopyFeedback('Download started.', false);
+    }
+
     window.onload = () => {
+      initMock5SolverPreview();
       applyTheme('indigo');
       updateTabButtons();
       loadQuestion(true);
