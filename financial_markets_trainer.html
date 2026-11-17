@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3 and 4 (bonds).">
+  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3–5 (bonds, term structure, forwards).">
   <title>Financial Markets Quiz Trainer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -52,6 +52,12 @@
         <span class="sm:hidden">Mock Quiz 4 · Bonds</span>
         <span class="hidden sm:inline">Mock Quiz 4 — Bonds &amp; Forwards</span>
       </button>
+      <button type="button" role="tab" id="tab-quiz-5" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-5')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 5 · Bonds</span>
+        <span class="hidden sm:inline">Mock Quiz 5 — STRIPS, Replication &amp; Forwards</span>
+      </button>
     </div>
     <p class="hidden sm:block text-xs text-slate-500 mt-2 text-center">Switch quizzes using the tabs above (single page — ready for Google Sites embed).</p>
   </nav>
@@ -82,6 +88,18 @@
       <div>$$P_0 = \frac{C}{1+y} + \cdots + \frac{C+N}{(1+y)^T} = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{yield-to-maturity}$$</div>
       <div>$$P_0 = \frac{C}{1+r_1} + \frac{C}{(1+r_2)^2} + \cdots + \frac{C+N}{(1+r_T)^T}, \quad r_t = \text{t-year spot rate}$$</div>
       <div>$$(1+r_T)^T = (1+r_t)^t \times (1+f_{t \to T})^{(T-t)} \quad (T > t,\; f_{t \to T} = \text{forward rate})$$</div>
+    </div>
+  </header>
+
+  <header id="header-quiz-5" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-amber-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 5 — STRIPS, Replication &amp; Forwards</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$Z_0 = \frac{N}{(1+y)^T} \iff y = \left(\frac{N}{Z_0}\right)^{1/T} - 1$$</div>
+      <div>$$(1+r_T)^T = (1+r_t)^t \times (1+f_{t \to T})^{(T-t)}, \quad T > t$$</div>
+      <div>$$\text{If } \text{CF}(\text{Bond}_1) = \sum_i w_i\, \text{CF}(\text{Bond}_i) \text{ (same default risk), then } P_1 = \sum_i w_i\, P_i$$</div>
+      <div>$$\text{HPR} = \frac{P_1 - P_0}{P_0} = \frac{P_1}{P_0} - 1$$</div>
+      <div>$$\text{Payoff}_{\text{short}} = \text{\# contracts} \times \text{contract size} \times (F_{0,T} - S_T)$$</div>
     </div>
   </header>
 
@@ -583,6 +601,155 @@
             }
           }
         ]
+      },
+      'mock-quiz-5': {
+        id: 'mock-quiz-5',
+        title: 'Mock Quiz 5',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'amber',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — 1-Year HPR (Zero-Coupon)',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const N = 1000;
+              const T = Math.floor(Math.random() * 8) + 12;
+              const y0Pct = (Math.floor(Math.random() * 50) + 20) / 10;
+              const y1Pct = (Math.floor(Math.random() * 30) + 5) / 10;
+              const y0 = y0Pct / 100;
+              const y1 = y1Pct / 100;
+              const p0 = N / Math.pow(1 + y0, T);
+              const p1 = N / Math.pow(1 + y1, T - 1);
+              const hpr = p1 / p0 - 1;
+              const hprShortcut = Math.pow(1 + y0, T) / Math.pow(1 + y1, T - 1) - 1;
+              return {
+                text: `Today (at t=0), a <b>${T}-year</b> US government default-risk-free zero-coupon bond with par value <b>N = ${N} $</b> has a yield-to-maturity of <b>${y0Pct.toFixed(1)}%</b> per year. Exactly one year later (at t=1), the same bond has a yield-to-maturity of <b>${y1Pct.toFixed(1)}%</b> per year. What is your <b>1-year holding period return (HPR)</b> if you buy at t=0 and sell at t=1? <span class="text-sm font-semibold">Enter as a decimal (e.g. +1.23% → <b>0.0123</b>, −1.23% → <b>−0.0123</b>).</span>`,
+                target: hpr,
+                params: { N, T, y0, y1, y0Pct, y1Pct, p0, p1, hpr, hprShortcut },
+                formula: '$$P_0 = \\frac{N}{(1+y_0)^T},\\quad P_1 = \\frac{N}{(1+y_1)^{T-1}},\\quad \\text{HPR} = \\frac{P_1}{P_0} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Price at t = 0', latex: `P_0 = \\frac{${p.N}}{(1+y_0)^{${p.T}}} = ${p.p0.toFixed(6)}\\text{ \\$}` },
+                  { caption: 'Price at t = 1 (T−1 years left)', latex: `P_1 = \\frac{${p.N}}{(1+y_1)^{${p.T - 1}}} = ${p.p1.toFixed(6)}\\text{ \\$}` },
+                  { caption: 'Holding period return', latex: `\\text{HPR} = \\frac{${p.p1.toFixed(4)}}{${p.p0.toFixed(4)}} - 1 = \\mathbf{${p.hpr.toFixed(6)}}` },
+                  { caption: 'Shortcut (N cancels)', latex: `\\text{HPR} = \\frac{(1+y_0)^{${p.T}}}{(1+y_1)^{${p.T - 1}}} - 1 = \\mathbf{${p.hprShortcut.toFixed(4)}} \\text{ (decimal)}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — 5-Year Spot Rate (No Arbitrage)',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const r4Pct = (Math.floor(Math.random() * 35) + 30) / 10;
+              const fwdPct = (Math.floor(Math.random() * 60) + 50) / 10;
+              const r4 = r4Pct / 100;
+              const fwd = fwdPct / 100;
+              const factor5 = Math.pow(1 + r4, 4) * (1 + fwd);
+              const r5 = Math.pow(factor5, 1 / 5) - 1;
+              return {
+                text: `In the US government zero-coupon (STRIPS) market today (t=0), the required return on a <b>4-year</b> zero-coupon bond is <b>${r4Pct.toFixed(1)}%</b> per year. The <b>1-year forward rate</b> starting at t=4 is <b>${fwdPct.toFixed(1)}%</b> per year. What is the required return on a <b>5-year</b> zero-coupon bond (per year) such that there is no arbitrage? <span class="text-sm font-semibold">Enter as a decimal (four digits after the decimal point).</span>`,
+                target: r5,
+                params: { r4Pct, fwdPct, r4, fwd, factor5, r5 },
+                formula: '(1+r_5)^5 = (1+r_4)^4 (1+f_{4 \\to 5}) \\implies r_5 = \\left[(1+r_4)^4 (1+f_{4 \\to 5})\\right]^{1/5} - 1',
+                getSteps: (p) => [
+                  { caption: 'No-arbitrage spot/forward link', latex: `(1+r_5)^5 = (1+r_4)^4 \\times (1+f_{4 \\to 5})` },
+                  { caption: '5-year compounding factor', latex: `(1+r_5)^5 = (1+r_4)^4 (1+f_{4 \\to 5}) = ${p.factor5.toFixed(8)}` },
+                  { caption: 'Annual 5-year spot rate', latex: `r_5 = (${p.factor5.toFixed(6)})^{1/5} - 1 = \\mathbf{${p.r5.toFixed(6)}}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.r5.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — No-Arbitrage Price (Law of One Price)',
+            answerKind: 'currency',
+            decimals: 0,
+            generate: () => {
+              const face1 = 100;
+              const face2 = 50;
+              const face3 = 50;
+              const p2 = Math.floor(Math.random() * 11) + 128;
+              const p3 = Math.floor(Math.random() * 7) + 45;
+              const n2 = 1;
+              const n3 = -1;
+              const p1 = n2 * p2 + n3 * p3;
+              return {
+                text: `<p class="mb-2 font-medium">Consider the following bonds (same AA credit rating):</p>
+                  <p class="mb-1"><b>Bond1:</b> maturity 2 years; face value <b>${face1}</b>; coupon rate <b>0%</b>; price = ?</p>
+                  <p class="mb-1"><b>Bond2:</b> maturity 2 years; face value <b>${face2}</b>; coupon rate <b>100%</b> per year; price = <b>${p2}</b></p>
+                  <p class="mb-1"><b>Bond3:</b> maturity 1 year; face value <b>${face3}</b>; coupon rate <b>0%</b>; price = <b>${p3}</b></p>
+                  <p class="mt-2">Replicate Bond1's cash flows using Bond2 and Bond3 only (ignore bonds with a different credit rating). What is the no-arbitrage price of Bond1?</p>`,
+                target: p1,
+                params: { face1, face2, face3, p2, p3, n2, n3, p1 },
+                formula: '$$P_{\\text{Bond1}} = n_2 \\times P_{\\text{Bond2}} + n_3 \\times P_{\\text{Bond3}}$$',
+                getSteps: (p) => [
+                  { caption: 'Bond cash flows (AA)', latex: `\\text{Bond1: } t=1\\!:\\!0,\\; t=2\\!:\\!${p.face1} \\quad \\text{Bond2: } t=1\\!:\\!${p.face2},\\; t=2\\!:\\!${2 * p.face2} \\quad \\text{Bond3: } t=1\\!:\\!${p.face3}` },
+                  { caption: 'Replication units', latex: `t=2:\\; ${p.face2} \\times n_2 = ${p.face1} \\Rightarrow n_2 = ${p.n2} \\quad;\\quad t=1:\\; ${p.face2} n_2 + ${p.face3} n_3 = 0 \\Rightarrow n_3 = ${p.n3}` },
+                  { caption: 'Law of One Price', latex: `P_{\\text{Bond1}} = ${p.n2} \\times ${p.p2} + (${p.n3}) \\times ${p.p3} = \\mathbf{${p.p1}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — 1-Year Forward Rate f₄→₅',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const r4Pct = (Math.floor(Math.random() * 30) + 25) / 10;
+              const bps = [15, 20, 25, 30, 35, 40][Math.floor(Math.random() * 6)];
+              const r5Pct = r4Pct + bps / 100;
+              const r4 = r4Pct / 100;
+              const r5 = r5Pct / 100;
+              const factor5 = Math.pow(1 + r5, 5);
+              const factor4 = Math.pow(1 + r4, 4);
+              const fwd = factor5 / factor4 - 1;
+              return {
+                text: `Today (t=0), the <b>4-year</b> spot rate on the government yield curve is <b>${r4Pct.toFixed(1)}%</b> per year. The <b>5-year</b> zero-coupon rate is <b>${bps} basis points</b> higher than the 4-year rate. What is <b>f₄→₅</b>, the 1-year forward rate starting at year 4? <span class="text-sm font-semibold">Enter as a decimal with four digits (e.g. 1.23% → <b>0.0123</b>).</span>`,
+                target: fwd,
+                params: { r4Pct, r5Pct, bps, r4, r5, factor5, factor4, fwd },
+                formula: '$$f_{4 \\to 5} = \\frac{(1+r_5)^5}{(1+r_4)^4} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Spot rates', latex: `r_4 = ${p.r4Pct.toFixed(1)}\\% = ${p.r4},\\quad r_5 = ${p.r5Pct.toFixed(2)}\\% = ${p.r5.toFixed(4)}\\; (${p.bps}\\text{ bps above } r_4)` },
+                  { caption: 'Compound factors', latex: `(1+r_5)^5 = ${p.factor5.toFixed(8)},\\quad (1+r_4)^4 = ${p.factor4.toFixed(8)}` },
+                  { caption: 'Forward rate', latex: `f_{4 \\to 5} = \\frac{${p.factor5.toFixed(6)}}{${p.factor4.toFixed(6)}} - 1 = \\mathbf{${p.fwd.toFixed(6)}}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.fwd.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Short Forward Payoff (Gold)',
+            answerKind: 'whole_euros',
+            decimals: 0,
+            generate: () => {
+              const contracts = Math.floor(Math.random() * 40) + 40;
+              const sizeG = Math.floor(Math.random() * 50) + 170;
+              const fwdPrice = Math.floor(Math.random() * 15) + 35;
+              const spotAtMat = fwdPrice + Math.floor(Math.random() * 12) + 3;
+              const totalQty = contracts * sizeG;
+              const payoff = totalQty * (fwdPrice - spotAtMat);
+              return {
+                text: `You hold <b>${contracts} short</b> forward contracts on gold. Each contract covers <b>${sizeG} grams</b>. Maturity is in <b>16 months</b>; settlement is cash. The forward price is <b>F(0,16m) = ${fwdPrice} €/gram</b>. At maturity, spot gold is <b>S = ${spotAtMat} €/gram</b>. What is your total payoff in euros? <span class="text-sm font-semibold">Enter a whole number of euros only (no decimal point, no € sign, no commas).</span>`,
+                target: payoff,
+                params: { contracts, sizeG, fwdPrice, spotAtMat, totalQty, payoff },
+                formula: '$$\\text{Payoff}_{\\text{short}} = \\text{\\# contracts} \\times \\text{size per contract} \\times (F_{0,T} - S_T)$$',
+                getSteps: (p) => [
+                  { caption: 'Total quantity (grams)', latex: `${p.contracts} \\times ${p.sizeG} = ${p.totalQty}\\text{ g}` },
+                  { caption: 'Payoff per gram (short)', latex: `F_{0,T} - S_T = ${p.fwdPrice} - ${p.spotAtMat} = ${p.fwdPrice - p.spotAtMat}\\text{ €/g}` },
+                  { caption: 'Total payoff', latex: `\\text{Payoff}_{\\text{short}} = ${p.totalQty} \\times (${p.fwdPrice - p.spotAtMat}) = \\mathbf{${p.payoff}}\\text{ €}` }
+                ]
+              };
+            }
+          }
+        ]
       }
     };
 
@@ -661,7 +828,8 @@
     const QUIZ_TAB_META = [
       { id: 'mock-quiz-2', tabId: 'tab-quiz-2', headerId: 'header-quiz-2', activeTab: 'bg-indigo-600 text-white' },
       { id: 'mock-quiz-3', tabId: 'tab-quiz-3', headerId: 'header-quiz-3', activeTab: 'bg-teal-600 text-white' },
-      { id: 'mock-quiz-4', tabId: 'tab-quiz-4', headerId: 'header-quiz-4', activeTab: 'bg-violet-600 text-white' }
+      { id: 'mock-quiz-4', tabId: 'tab-quiz-4', headerId: 'header-quiz-4', activeTab: 'bg-violet-600 text-white' },
+      { id: 'mock-quiz-5', tabId: 'tab-quiz-5', headerId: 'header-quiz-5', activeTab: 'bg-amber-600 text-white' }
     ];
 
     const THEME_STYLES = {
@@ -700,6 +868,18 @@
         tag: 'bg-violet-100 text-violet-800',
         progressActive: 'bg-violet-600',
         progressDone: 'bg-violet-300'
+      },
+      amber: {
+        score: 'font-bold text-amber-800',
+        secondary: 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100',
+        validate: 'bg-amber-600 hover:bg-amber-700',
+        reveal: 'text-amber-800 hover:text-amber-950',
+        inputRing: 'focus:ring-amber-500',
+        correctionBorder: 'border-amber-100',
+        correctionFormula: 'bg-amber-50/50 border-amber-100',
+        tag: 'bg-amber-100 text-amber-900',
+        progressActive: 'bg-amber-600',
+        progressDone: 'bg-amber-300'
       }
     };
 
@@ -750,6 +930,9 @@
       if (template.answerKind === 'decimal') {
         return value.toFixed(template.decimals ?? 4) + ' (decimal)';
       }
+      if (template.answerKind === 'whole_euros') {
+        return Math.round(value) + ' € (whole euros)';
+      }
       const d = template.decimals ?? 2;
       return value.toFixed(d) + ' €';
     }
@@ -763,10 +946,17 @@
         hint.textContent = 'Example: for 1.23%, enter 0.0123 (not 1.23).';
         hint.classList.remove('hidden');
         input.placeholder = 'e.g. 0.0137';
+      } else if (template.answerKind === 'whole_euros') {
+        label.textContent = 'Your Answer (whole €):';
+        hint.textContent = 'Enter a whole number only (e.g. −79982, no decimal point or € sign).';
+        hint.classList.remove('hidden');
+        input.placeholder = 'e.g. -79982';
+        input.step = '1';
       } else {
         label.textContent = 'Your Answer (€):';
         hint.classList.add('hidden');
         input.placeholder = template.decimals === 0 ? 'e.g. 1108' : 'e.g. 109.59';
+        input.step = 'any';
       }
     }
 
@@ -774,6 +964,9 @@
       if (template.answerKind === 'decimal') {
         return Math.abs(userVal - expected) < 0.00025 ||
           (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.015);
+      }
+      if (template.answerKind === 'whole_euros') {
+        return Math.abs(userVal - Math.round(expected)) < 0.5;
       }
       const tol = template.decimals === 0 ? 0.5 : 0.05;
       if (template.decimals === undefined && template.answerKind === 'currency') {
