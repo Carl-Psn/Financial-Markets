@@ -3,347 +3,1507 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3–6 (bonds, term structure, forwards).">
   <title>Financial Markets Quiz Trainer</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- MathJax for rendering LaTeX formulas cleanly -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      startup: { typeset: false }
+    };
+  </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    .formula-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+    }
+    .formula-scroll mjx-container {
+      margin: 0 auto !important;
+    }
+    @media (max-width: 639px) {
+      mjx-container[jax="CHTML"][display="true"] {
+        font-size: 95% !important;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center px-2 py-3 sm:p-4 md:p-6">
 
-  <!-- Top Reference Formulas Bar -->
-  <header class="w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-6 border-t-4 border-indigo-600">
-    <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2 text-center">Reference Formulas / Aide-mémoire</h2>
-    <div class="text-center text-sm md:text-base text-slate-700 overflow-x-auto py-2 flex flex-wrap justify-around gap-4">
+  <nav class="w-full max-w-4xl mb-3 sm:mb-4" role="tablist" aria-label="Mock quizzes">
+    <div class="flex flex-col sm:flex-row rounded-xl bg-white shadow-sm border border-slate-200 p-1 gap-1">
+      <button type="button" role="tab" id="tab-quiz-2" aria-selected="true" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-2')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug">
+        <span class="sm:hidden">Mock Quiz 2 · Equities</span>
+        <span class="hidden sm:inline">Mock Quiz 2 — Equities</span>
+      </button>
+      <button type="button" role="tab" id="tab-quiz-3" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-3')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 3 · Bonds</span>
+        <span class="hidden sm:inline">Mock Quiz 3 — Bonds</span>
+      </button>
+      <button type="button" role="tab" id="tab-quiz-4" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-4')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 4 · Bonds</span>
+        <span class="hidden sm:inline">Mock Quiz 4 — Bonds &amp; Forwards</span>
+      </button>
+      <button type="button" role="tab" id="tab-quiz-5" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-5')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 5 · Bonds</span>
+        <span class="hidden sm:inline">Mock Quiz 5 — STRIPS, Replication &amp; Forwards</span>
+      </button>
+      <button type="button" role="tab" id="tab-quiz-6" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-6')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 6 · Bonds</span>
+        <span class="hidden sm:inline">Mock Quiz 6 — Replication, Duration &amp; Forwards</span>
+      </button>
+    </div>
+    <p class="hidden sm:block text-xs text-slate-500 mt-2 text-center">Switch quizzes using the tabs above (single page — ready for Google Sites embed).</p>
+  </nav>
+
+  <header id="header-quiz-2" class="w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-indigo-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 2 — Stocks &amp; Dividends</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 flex flex-col sm:flex-row sm:flex-wrap justify-around gap-3 sm:gap-4">
       <div>$$k_i = r_f + \beta_i \times (E(r_M) - r_f)$$</div>
-      <div>$$V_0 = \frac{D_1}{k - g} = \frac{(1 - b) \times E_1}{k - b \times ROE^{NewProjects}}$$</div>
+      <div>$$V_0 = \frac{D_1}{k - g} = \frac{(1 - b) \times E_1}{k - b \times ROE^{\text{NewProjects}}}$$</div>
       <div>$$P_0 = \frac{E_1}{k} + PVGO_0$$</div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-6 md:p-8 flex flex-col gap-6">
+  <header id="header-quiz-3" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-teal-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 3 — Bonds &amp; Interest Rates</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-teal-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$P_0 = \frac{C}{1+y} + \cdots + \frac{C+N}{(1+y)^T} = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{yield-to-maturity}$$</div>
+      <div>$$P_0 = \frac{C}{1+r_1} + \frac{C+N}{(1+r_2)^2} + \cdots, \quad r_t = \text{t-year spot rate}$$</div>
+    </div>
+  </header>
 
-    <!-- Status Bar: Timer & Actions -->
-    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-      <div class="flex items-center gap-3">
-        <span class="text-xs uppercase font-semibold text-slate-500">Timer</span>
-        <div id="timer" class="text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md">03:00</div>
+  <header id="header-quiz-4" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-violet-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 4 — Bonds, Term Structure &amp; Forwards</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-violet-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$P_0 = \frac{C}{1+y} + \cdots + \frac{C+N}{(1+y)^T} = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{yield-to-maturity}$$</div>
+      <div>$$P_0 = \frac{C}{1+r_1} + \frac{C}{(1+r_2)^2} + \cdots + \frac{C+N}{(1+r_T)^T}, \quad r_t = \text{t-year spot rate}$$</div>
+      <div>$$(1+r_T)^T = (1+r_t)^t \times (1+f_{t \to T})^{(T-t)} \quad (T > t,\; f_{t \to T} = \text{forward rate})$$</div>
+    </div>
+  </header>
+
+  <header id="header-quiz-5" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-amber-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 5 — STRIPS, Replication &amp; Forwards</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$Z_0 = \frac{N}{(1+y)^T} \iff y = \left(\frac{N}{Z_0}\right)^{1/T} - 1$$</div>
+      <div>$$(1+r_T)^T = (1+r_t)^t \times (1+f_{t \to T})^{(T-t)}, \quad T > t$$</div>
+      <div>$$\text{If } \text{CF}(\text{Bond}_1) = \sum_i w_i\, \text{CF}(\text{Bond}_i) \text{ (same default risk), then } P_1 = \sum_i w_i\, P_i$$</div>
+      <div>$$\text{HPR} = \frac{P_1 - P_0}{P_0} = \frac{P_1}{P_0} - 1$$</div>
+      <div>
+        <p class="text-xs sm:text-sm text-slate-600 mb-1">Short Forward Contract Payoff at Maturity \(T\):</p>
+        <div>$$\text{Payoff}_{\text{short}} = \text{Number of contracts} \times \text{Contract size} \times (F_{0,T} - S_T)$$</div>
       </div>
-      <div class="flex gap-2">
-        <button id="btn-random-vars" onclick="generateNewVariables()" class="px-3 py-2 text-xs font-semibold bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition">
-          🔀 New Variables
+    </div>
+    <div class="mt-4 pt-4 border-t border-amber-100">
+      <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-700 mb-2 text-center">Python Fast Solver (decimals)</h2>
+      <p class="text-[11px] sm:text-xs text-slate-600 text-center mb-3 leading-relaxed">Copy or download the script below, then paste it into a Python-capable calculator or IDE (e.g. NumWorks script, Pyscript, Thonny).</p>
+      <div class="flex flex-col sm:flex-row gap-2 justify-center mb-3">
+        <button type="button" id="btn-mock5-copy-solver" onclick="copyMock5Solver()"
+                class="min-h-[44px] px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition">
+          Copy Python script
         </button>
-        <button id="btn-next" onclick="nextQuestion()" class="px-3 py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
-          Next Question ➔
+        <button type="button" id="btn-mock5-download-solver" onclick="downloadMock5Solver()"
+                class="min-h-[44px] px-4 py-2 text-xs font-semibold rounded-lg bg-white text-amber-900 border border-amber-300 hover:bg-amber-50 transition">
+          Download .py file
+        </button>
+      </div>
+      <p id="mock5-solver-copy-feedback" class="hidden text-center text-xs font-semibold text-emerald-700 mb-2">Copied to clipboard.</p>
+      <details class="rounded-lg border border-amber-200 bg-amber-50/40 text-left">
+        <summary class="cursor-pointer px-3 py-2 text-xs font-semibold text-amber-900 select-none min-h-[44px] flex items-center">Preview script source</summary>
+        <pre id="mock5-solver-preview" class="text-[10px] sm:text-xs leading-snug overflow-x-auto p-3 pt-0 text-slate-800 max-h-48 sm:max-h-64 border-t border-amber-200"></pre>
+      </details>
+    </div>
+  </header>
+
+  <header id="header-quiz-6" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-rose-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 6 — Replication, Duration &amp; Forwards</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-rose-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$P_0 = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{yield-to-maturity}$$</div>
+      <div>$$P_0 = \frac{N}{(1+y)^T} \quad \text{(zero-coupon bond)}$$</div>
+      <div>$$\text{Price}(\text{Annuity}) = \text{Price}(\text{Replicating Portfolio}) \quad \text{(Law of One Price, same default risk)}$$</div>
+      <div>$$\text{All else equal, bond price sensitivity } \uparrow \text{ with maturity } T \text{ (Macaulay / modified duration)}$$</div>
+      <div>$$\text{Payoff}_{\text{short}} = N_{\text{contracts}} \times m \times (F_0 - S_T)$$</div>
+    </div>
+  </header>
+
+  <main id="panel-quiz" role="tabpanel" class="w-full max-w-4xl bg-white shadow-lg rounded-xl p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
+
+    <div class="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-3 sm:justify-start sm:gap-4 w-full sm:w-auto">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <span class="text-[10px] sm:text-xs uppercase font-semibold text-slate-500">Timer</span>
+          <div id="timer" class="text-xl sm:text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md" role="timer" aria-live="polite">03:00</div>
+        </div>
+        <div class="text-[10px] sm:text-xs text-slate-600">
+          Session score: <span id="score-display" class="font-bold">0 / 0</span>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <button type="button" id="btn-random-vars" onclick="generateNewVariables()"
+                class="theme-btn-secondary w-full sm:w-auto min-h-[44px] px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg border transition">
+          New Variables
+        </button>
+        <button type="button" id="btn-next" onclick="nextQuestion()"
+                class="w-full sm:w-auto min-h-[44px] px-3 py-2.5 sm:py-2 text-xs font-semibold bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition">
+          Next Question →
         </button>
       </div>
     </div>
 
-    <!-- Question Box -->
+    <div id="progress-bar" class="flex gap-1.5 justify-center" aria-hidden="true"></div>
+
     <div class="space-y-3">
-      <div class="flex items-center justify-between">
-        <span id="question-tag" class="text-xs font-bold tracking-wide uppercase px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">
-          Question 1 / 5
-        </span>
-      </div>
-      <div id="question-text" class="text-slate-700 leading-relaxed text-base md:text-lg min-h-[80px]">
-        <!-- Dynamic Question Content -->
-      </div>
+      <span id="question-tag" class="inline-block max-w-full text-[10px] sm:text-xs font-bold tracking-wide uppercase px-2 sm:px-2.5 py-1 rounded-full break-words">
+        Question 1 / 5
+      </span>
+      <div id="question-text" class="text-slate-700 leading-relaxed text-sm sm:text-base md:text-lg min-h-[64px] sm:min-h-[80px] break-words"></div>
     </div>
 
-    <!-- Answer Input Section -->
-    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-      <label for="user-answer" class="block text-xs font-bold uppercase text-slate-600">Your Answer (€):</label>
-      <div class="flex gap-2">
+    <div class="space-y-3 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200">
+      <label for="user-answer" id="answer-label" class="block text-[10px] sm:text-xs font-bold uppercase text-slate-600">Your Answer (€):</label>
+      <p id="answer-hint" class="text-[11px] sm:text-xs text-slate-500 leading-snug hidden"></p>
+      <div class="flex flex-col sm:flex-row gap-2">
         <input type="number" step="any" id="user-answer" placeholder="e.g. 445.45" onkeydown="if(event.key==='Enter') checkAnswer()"
-               class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-lg">
-        <button onclick="checkAnswer()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+               class="flex-1 min-w-0 w-full border border-slate-300 rounded-lg px-4 py-3 sm:py-2 focus:ring-2 focus:outline-none text-base sm:text-lg theme-input-ring"
+               autocomplete="off" inputmode="decimal">
+        <button type="button" id="btn-validate" onclick="checkAnswer()"
+                class="theme-btn-primary w-full sm:w-auto min-h-[44px] text-white font-semibold px-6 py-3 sm:py-2 rounded-lg transition shrink-0">
           Validate
         </button>
       </div>
       <div id="feedback" class="hidden text-sm font-semibold p-3 rounded-lg text-center"></div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="flex justify-between items-center pt-2">
-      <button id="btn-reveal" onclick="revealCorrection()" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold underline">
+      <button type="button" id="btn-reveal" onclick="revealCorrection()"
+              class="theme-link text-left text-xs sm:text-sm font-semibold underline min-h-[44px] sm:min-h-0 py-2 sm:py-0">
         Show Detailed Correction
       </button>
     </div>
 
-    <!-- Detailed Correction View -->
-    <div id="correction-box" class="hidden border-t-2 border-indigo-100 pt-4 space-y-4">
-      <h3 class="text-md font-bold text-slate-800">Detailed Solution:</h3>
-      
-      <div class="space-y-2 bg-indigo-50/50 p-4 rounded-lg border border-indigo-100 text-sm">
-        <h4 class="font-bold text-indigo-900 uppercase text-xs">Generic Formula:</h4>
+    <div id="correction-box" class="hidden border-t-2 pt-4 space-y-4 theme-correction-border">
+      <h3 class="text-md font-bold text-slate-800">Detailed Solution</h3>
+      <div class="space-y-2 p-3 sm:p-4 rounded-lg border text-xs sm:text-sm theme-correction-formula">
+        <h4 class="font-bold uppercase text-xs">Generic Formula</h4>
         <div id="correction-formula" class="text-slate-800 font-medium py-1"></div>
       </div>
-
-      <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm">
-        <h4 class="font-bold text-slate-700 uppercase text-xs">Step-by-Step Calculation:</h4>
-        <div id="correction-steps" class="space-y-2 text-slate-700"></div>
+      <div class="space-y-2 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200 text-xs sm:text-sm">
+        <h4 class="font-bold text-slate-700 uppercase text-xs">Step-by-Step Calculation</h4>
+        <div id="correction-steps" class="space-y-3 text-slate-700"></div>
       </div>
+      <p id="correction-expected" class="text-sm font-semibold text-emerald-800 bg-emerald-50 p-3 rounded-lg"></p>
     </div>
-
   </main>
 
   <script>
-    // Templates for the 5 questions with variable generator functions and solution logic
-    const questionTemplates = [
-      {
-        id: 1,
-        title: "Question 1 (CGDDM Price)",
-        generate: () => {
-          const d1 = Math.floor(Math.random() * 40) + 20; // 20 to 60
-          const k = (Math.floor(Math.random() * 10) + 12) / 100; // 12% to 21%
-          const g = (Math.floor(Math.random() * 6) + 3) / 100; // 3% to 8%
-          const v0 = d1 / (k - g);
-          return {
-            text: `What is the value of company A's shares as of today (at t=0) using the Constant-Growth Dividend Discount Model (CGDDM) if the next dividend paid exactly a year from today at date t=1 is expected to be <b>${d1}</b> euros/share, the required rate of return on the shares is <b>${(k*100).toFixed(1)} percent</b>, and the growth rate of dividends is <b>${(g*100).toFixed(1)} percent</b> and constant forever?`,
-            target: v0,
-            params: { d1, k, g },
-            formula: "$$V_0 = \\frac{D_1}{k - g}$$",
-            getSteps: (p) => [
-              `Identify variables: $D_1 = ${p.d1}\\text{ €}$, $k = ${(p.k*100).toFixed(1)}\\% = ${p.k}$, $g = ${(p.g*100).toFixed(1)}\\% = ${p.g}$`,
-              `Denominator difference: $k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}$`,
-              `Result: $V_0 = \\frac{${p.d1}}{${(p.k - p.g).toFixed(4)}} = \\mathbf{${(p.d1/(p.k-p.g)).toFixed(4)}\\text{ €}}$`
-            ]
-          };
-        }
+    /*
+     * Question wording (text: `...` in templates below):
+     * - Inline math: \\( r_1 = 2\\% \\)  — matches MathJax inline delimiters in <head>.
+     * - Avoid $...$ or $$...$$ in questions: $$ is display math and starts a new line;
+     *   lone $ pairs often break layout before the next <b> value </b>.
+     * - Or skip TeX: r<sub>1</sub> = <b>2%</b> (no MathJax, stays on one line).
+     */
+    const QUIZZES = {
+      'mock-quiz-2': {
+        id: 'mock-quiz-2',
+        title: 'Mock Quiz 2',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'indigo',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — CGDDM Price',
+            answerKind: 'currency',
+            generate: () => {
+              const d1 = Math.floor(Math.random() * 40) + 20;
+              const k = (Math.floor(Math.random() * 10) + 12) / 100;
+              const g = (Math.floor(Math.random() * 6) + 3) / 100;
+              const v0 = d1 / (k - g);
+              return {
+                text: `What is the value of company A's shares as of today (t=0) using the Constant-Growth Dividend Discount Model (CGDDM) if the next dividend paid exactly a year from today at date t=1 is expected to be <b>${d1}</b> euros/share, the required rate of return on the shares is <b>${(k * 100).toFixed(1)} percent</b>, and the growth rate of dividends is <b>${(g * 100).toFixed(1)} percent</b> and constant forever?`,
+                target: v0,
+                params: { d1, k, g },
+                formula: '$$V_0 = \\frac{D_1}{k - g}$$',
+                getSteps: (p) => [
+                  { caption: 'Identify variables', latex: `D_1 = ${p.d1}\\text{ €},\\quad k = ${(p.k * 100).toFixed(1)}\\% = ${p.k},\\quad g = ${(p.g * 100).toFixed(1)}\\% = ${p.g}` },
+                  { caption: 'Denominator', latex: `k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}` },
+                  { caption: 'Result', latex: `V_0 = \\frac{${p.d1}}{${(p.k - p.g).toFixed(4)}} = \\mathbf{${(p.d1 / (p.k - p.g)).toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — Next Dividend',
+            answerKind: 'currency',
+            generate: () => {
+              const p0 = Math.floor(Math.random() * 80) + 50;
+              const k = (Math.floor(Math.random() * 8) + 12) / 100;
+              const g = (Math.floor(Math.random() * 5) + 3) / 100;
+              const d1 = p0 * (k - g);
+              return {
+                text: `Company Q's required rate of return is <b>${(k * 100).toFixed(1)} percent</b> per year and its dividends will be growing at <b>${(g * 100).toFixed(1)} percent</b> per year forever. If today (at t=0) company Q's share price is <b>${p0} euro/share</b>, what must be the next year's expected dividend per share at date t=1?`,
+                target: d1,
+                params: { p0, k, g },
+                formula: '$$D_1 = P_0 \\times (k - g)$$',
+                getSteps: (p) => [
+                  { caption: 'Identify variables', latex: `P_0 = ${p.p0}\\text{ €},\\quad k = ${(p.k * 100).toFixed(1)}\\%,\\quad g = ${(p.g * 100).toFixed(1)}\\%` },
+                  { caption: 'Rate spread', latex: `k - g = ${(p.k - p.g).toFixed(4)}` },
+                  { caption: 'Result', latex: `D_1 = ${p.p0} \\times ${(p.k - p.g).toFixed(4)} = \\mathbf{${(p.p0 * (p.k - p.g)).toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — PVGO',
+            answerKind: 'currency',
+            generate: () => {
+              const beta = parseFloat(((Math.random() * 0.8) + 0.6).toFixed(2));
+              const e_rm = (Math.floor(Math.random() * 6) + 10) / 100;
+              const rf = (Math.floor(Math.random() * 20) + 5) / 1000;
+              const e1 = Math.floor(Math.random() * 10) + 8;
+              const p0 = Math.floor(Math.random() * 80) + 120;
+              const k = rf + beta * (e_rm - rf);
+              const p0_no_growth = e1 / k;
+              const pvgo = p0 - p0_no_growth;
+              return {
+                text: `Firm B's shares have a CAPM beta of <b>${beta}</b>, the expected rate of return on the market portfolio is <b>${(e_rm * 100).toFixed(1)} percent</b> per year, and the risk-free rate is <b>${(rf * 100).toFixed(1)} percent</b> per year. Next year's expected earnings for firm B is <b>${e1} euro/share</b>. Today's stock price for firm B is <b>${p0} euro/share</b>. What is the present value of the growth opportunities (PVGO) for firm B as of today (t=0)?`,
+                target: pvgo,
+                params: { beta, e_rm, rf, e1, p0, k, p0_no_growth },
+                formula: '$$k = r_f + \\beta \\times (E(r_M) - r_f) \\quad ; \\quad PVGO_0 = P_0 - \\frac{E_1}{k}$$',
+                getSteps: (p) => [
+                  { caption: 'Required return (CAPM)', latex: `k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%` },
+                  { caption: 'No-growth value', latex: `\\frac{E_1}{k} = \\frac{${p.e1}}{${p.k.toFixed(4)}} = ${p.p0_no_growth.toFixed(2)}\\text{ €}` },
+                  { caption: 'PVGO', latex: `PVGO_0 = ${p.p0} - ${p.p0_no_growth.toFixed(2)} = \\mathbf{${(p.p0 - p.p0_no_growth).toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — Price P₁ (Special Dividend)',
+            answerKind: 'currency',
+            generate: () => {
+              const rf = Math.floor(Math.random() * 20) / 1000;
+              const beta = parseFloat(((Math.random() * 0.8) + 0.4).toFixed(2));
+              const e_rm = (Math.floor(Math.random() * 6) + 10) / 100;
+              const d_reg = Math.floor(Math.random() * 6) + 5;
+              const d_spec = parseFloat((Math.random() * 8 + 5).toFixed(1));
+              const k = rf + beta * (e_rm - rf);
+              const p1 = (d_reg / k) + (d_spec / (1 + k));
+              return {
+                text: `Firm OilCo is expected to pay a constant regular dividend of <b>${d_reg} euro/year</b> in every year forever starting one year from t=0 (at dates t=1, 2, 3, …) — these dividends do not grow. OilCo is expected to pay a one-time special dividend of <b>${d_spec} euro/share</b> at date t=2 (on top of the regular dividend). Assume CAPM holds: risk-free rate is <b>${(rf * 100).toFixed(1)} percent</b>, OilCo has a beta of <b>${beta}</b>, and the expected return on the market is <b>${(e_rm * 100).toFixed(1)} percent</b>. What is the company's expected stock price at date t=1 right after the payment of the first regular dividend?`,
+                target: p1,
+                params: { rf, beta, e_rm, d_reg, d_spec, k, p1 },
+                formula: '$$P_1 = \\frac{D_{\\text{regular}}}{k} + \\frac{D_{\\text{special}}}{1 + k}$$',
+                getSteps: (p) => [
+                  { caption: 'Required return k', latex: `k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = ${(p.k * 100).toFixed(2)}\\%` },
+                  { caption: 'Regular perpetuity at t = 1', latex: `\\frac{${p.d_reg}}{${p.k.toFixed(4)}} = ${(p.d_reg / p.k).toFixed(2)}` },
+                  { caption: 'Special dividend (t = 2 → t = 1)', latex: `\\frac{${p.d_spec}}{1 + ${p.k.toFixed(4)}} = ${(p.d_spec / (1 + p.k)).toFixed(2)}` },
+                  { caption: 'Stock price at t = 1', latex: `P_1 = ${(p.d_reg / p.k).toFixed(2)} + ${(p.d_spec / (1 + p.k)).toFixed(2)} = \\mathbf{${p.p1.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Dividend Cancellation',
+            answerKind: 'currency',
+            generate: () => {
+              const d1 = Math.floor(Math.random() * 25) + 20;
+              const k = (Math.floor(Math.random() * 10) + 15) / 100;
+              const delta_p0 = -d1 / (1 + k);
+              return {
+                text: `As of last night, utility company C was expected to pay a dividend of <b>${d1} euro/share</b> next year at date t=1, and the level of these dividends was expected to stay constant forever (dividends do not grow). The required rate of return on C shares is <b>${(k * 100).toFixed(1)} percent</b> per year. This morning management announces that they will skip next year's dividend at t=1 but will resume paying constant dividends starting at date t=2. What is the stock price change at the announcement?`,
+                target: delta_p0,
+                params: { d1, k, delta_p0 },
+                formula: '$$\\Delta P_0 = - \\frac{D_1}{1 + k}$$',
+                getSteps: (p) => [
+                  { caption: 'The skipped dividend at t = 1 is the present value lost, discounted to t = 0' },
+                  { caption: 'Price change', latex: `\\Delta P_0 = - \\frac{${p.d1}}{1 + ${p.k}} = \\mathbf{${p.delta_p0.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          }
+        ]
       },
-      {
-        id: 2,
-        title: "Question 2 (Next Dividend)",
-        generate: () => {
-          const p0 = Math.floor(Math.random() * 80) + 50; // 50 to 130
-          const k = (Math.floor(Math.random() * 8) + 12) / 100; // 12% to 19%
-          const g = (Math.floor(Math.random() * 5) + 3) / 100; // 3% to 7%
-          const d1 = p0 * (k - g);
-          return {
-            text: `Company Q's required rate of return is <b>${(k*100).toFixed(1)} percent</b> per year and its dividends will be growing at <b>${(g*100).toFixed(1)} percent</b> per year forever. If today (at t=0) company Q's share price is <b>${p0} euro/share</b>, what must be the next year's expected dividend per share at date t=1?`,
-            target: d1,
-            params: { p0, k, g },
-            formula: "$$D_1 = P_0 \\times (k - g)$$",
-            getSteps: (p) => [
-              `Identify variables: $P_0 = ${p.p0}\\text{ €}$, $k = ${(p.k*100).toFixed(1)}\\%$, $g = ${(p.g*100).toFixed(1)}\\%$`,
-              `Rate spread: $k - g = ${p.k} - ${p.g} = ${(p.k - p.g).toFixed(4)}$`,
-              `Result: $D_1 = ${p.p0} \\times ${(p.k - p.g).toFixed(4)} = \\mathbf{${(p.p0*(p.k-p.g)).toFixed(4)}\\text{ €}}$`
-            ]
-          };
-        }
+      'mock-quiz-3': {
+        id: 'mock-quiz-3',
+        title: 'Mock Quiz 3',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'teal',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — Zero-Coupon Bond Price',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = 1000;
+              const T = Math.floor(Math.random() * 11) + 18;
+              const yPct = Math.floor(Math.random() * 6) + 5;
+              const y = yPct / 100;
+              const p0 = N / Math.pow(1 + y, T);
+              const denom = Math.pow(1 + y, T);
+              return {
+                text: `The government-issued zero-coupon bond Z has a par (face) value of <b>${N} €</b> and a time-until maturity of exactly <b>${T} years</b> from today (t=0). If the yield-to-maturity on bond Z is <b>${yPct}%</b> per year, what must be the price of bond Z today?`,
+                target: p0,
+                params: { N, T, y, yPct, p0, denom },
+                formula: '$$P_0 = \\frac{N}{(1+y)^T}$$',
+                getSteps: (p) => [
+                  { caption: 'Given', latex: `N = ${p.N}\\text{ €},\\quad T = ${p.T},\\quad y = ${p.yPct}\\% = ${p.y}` },
+                  { caption: 'Discount factor', latex: `(1+y)^T = (1 + ${p.y})^{${p.T}} = ${p.denom.toFixed(5)}` },
+                  { caption: 'Result', latex: `P_0 = \\frac{${p.N}}{${p.denom.toFixed(5)}} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — Price with Spot Rates',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const r1Pct = Math.floor(Math.random() * 4) + 1;
+              const r2Pct = Math.floor(Math.random() * 6) + 5;
+              const r1 = r1Pct / 100;
+              const r2 = r2Pct / 100;
+              const N = 100;
+              const couponPct = Math.floor(Math.random() * 5) + 10;
+              const C = (couponPct / 100) * N;
+              const p0 = C / (1 + r1) + (C + N) / Math.pow(1 + r2, 2);
+              const term1 = C / (1 + r1);
+              const term2 = (C + N) / Math.pow(1 + r2, 2);
+              return {
+                text: `As of today, the 1-year risk-free interest rate is \\(r_1 = ${r1Pct}\\%\\) and the 2-year risk-free rate is \\(r_2 = ${r2Pct}\\%\\). What is the price of a default-risk-free bond B with maturity <b>2 years</b>, face value <b>${N} €</b>, and annual coupon rate <b>${couponPct}%</b> (one coupon per year)? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: p0,
+                params: { r1, r2, r1Pct, r2Pct, N, C, couponPct, p0, term1, term2 },
+                formula: '$$P_0 = \\frac{C}{1+r_1} + \\frac{C+N}{(1+r_2)^2}$$',
+                getSteps: (p) => [
+                  { caption: 'Coupon and cash flows', latex: `C = ${p.couponPct}\\% \\times ${p.N} = ${p.C}\\text{ €},\\quad C+N \\text{ at } t=2 = ${(p.C + p.N).toFixed(2)}\\text{ €}` },
+                  { caption: 'Discount coupon at t = 1', latex: `\\frac{C}{1+r_1} = \\frac{${p.C}}{${(1 + p.r1).toFixed(2)}} = ${p.term1.toFixed(6)}` },
+                  { caption: 'Discount principal + coupon at t = 2', latex: `\\frac{C+N}{(1+r_2)^2} = \\frac{${p.C + p.N}}{${Math.pow(1 + p.r2, 2).toFixed(4)}} = ${p.term2.toFixed(6)}` },
+                  { caption: 'Result', latex: `P_0 = ${p.term1.toFixed(2)} + ${p.term2.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — No-Arbitrage Price (Replication)',
+            answerKind: 'currency',
+            decimals: 0,
+            generate: () => {
+              const face = 100;
+              const pA = Math.floor(Math.random() * 5) + 94;
+              const pB = Math.floor(Math.random() * 5) + 88;
+              const N_C = 1000;
+              const couponPct = 10;
+              const cf1 = (couponPct / 100) * N_C;
+              const cf2 = cf1 + N_C;
+              const unitsA = cf1 / face;
+              const unitsB = cf2 / face;
+              const pC = unitsA * pA + unitsB * pB;
+              return {
+                text: `<p class="mb-2">Bond A: one-year maturity, 0% coupon, face value <b>${face} €</b>, current price <b>${pA} €</b>.</p>
+                  <p class="mb-2">Bond B: two-year maturity, 0% coupon, face value <b>${face} €</b>, current price <b>${pB} €</b>.</p>
+                  <p>Bond C: two-year maturity, <b>${couponPct}%</b> coupon per year (annual payments), face value <b>${N_C} €</b>.</p>
+                  <p class="mt-2 font-medium">What is the no-arbitrage price of Bond C?</p>`,
+                target: pC,
+                params: { face, pA, pB, N_C, couponPct, cf1, cf2, unitsA, unitsB, pC },
+                formula: '$$P_C = (\\text{units of A} \\times P_A) + (\\text{units of B} \\times P_B)$$',
+                getSteps: (p) => [
+                  { caption: 'Bond C cash flows', latex: `CF_1 = ${p.cf1}\\text{ €},\\quad CF_2 = ${p.cf2}\\text{ €}` },
+                  { caption: 'Replication portfolio', latex: `${p.unitsA} \\times \\text{Bond A (}t=1\\text{)},\\quad ${p.unitsB} \\times \\text{Bond B (}t=2\\text{)}` },
+                  { caption: 'No-arbitrage price', latex: `P_C = ${p.unitsA} \\times ${p.pA} + ${p.unitsB} \\times ${p.pB} = \\mathbf{${p.pC.toFixed(0)}\\text{ €}}` },
+                  { caption: 'Discount factors (check)', latex: `d_1 = \\frac{P_A}{N} = ${(p.pA / p.face).toFixed(2)},\\quad d_2 = \\frac{P_B}{N} = ${(p.pB / p.face).toFixed(2)}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — Yield-to-Maturity',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const N = 1000;
+              const T = Math.floor(Math.random() * 5) + 7;
+              const yTruePct = (Math.floor(Math.random() * 120) + 80) / 100;
+              const y = yTruePct / 100;
+              const p0 = Math.round(N / Math.pow(1 + y, T));
+              const yCalc = Math.pow(N / p0, 1 / T) - 1;
+              return {
+                text: `A government zero-coupon bond with <b>${T} years</b> to maturity and face value <b>${N} €</b> trades at <b>${p0} €</b> today (t=0). What is the yield-to-maturity? <span class="text-sm font-semibold">Enter your answer as a decimal (e.g. 1.37% → <b>0.0137</b>).</span>`,
+                target: yCalc,
+                params: { N, T, p0, yCalc },
+                formula: '$$P_0 = \\frac{N}{(1+y)^T} \\implies y = \\left(\\frac{N}{P_0}\\right)^{1/T} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Yield-to-maturity', latex: `y = \\left(\\frac{${p.N}}{${p.p0}}\\right)^{1/${p.T}} - 1 = ${p.yCalc.toFixed(6)}` },
+                  { caption: 'Answer format', latex: `${(p.yCalc * 100).toFixed(2)}\\% \\;\\Rightarrow\\; \\text{enter } \\mathbf{${p.yCalc.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Coupon (Bond at Par)',
+            answerKind: 'currency',
+            decimals: 0,
+            generate: () => {
+              const N = [500, 1000, 1000, 2000][Math.floor(Math.random() * 4)];
+              const yPct = Math.floor(Math.random() * 8) + 8;
+              const y = yPct / 100;
+              const p0 = N;
+              const C = y * N;
+              return {
+                text: `Bond A is a 2-year bond with face value <b>${N} €</b> and one annual coupon payment. Its current price is <b>${p0} €</b> (at par) and its yield-to-maturity is <b>${yPct}%</b> per year. What is its coupon payment in €?`,
+                target: C,
+                params: { N, p0, y, yPct, C },
+                formula: '$$\\text{At par: } P_0 = N \\implies \\text{coupon rate} = y \\implies C = y \\times N$$',
+                getSteps: (p) => [
+                  { caption: 'At par, coupon rate equals yield-to-maturity (P0 = N)' },
+                  { caption: 'Coupon payment', latex: `C = y \\times N = ${p.yPct}\\% \\times ${p.N} = \\mathbf{${p.C.toFixed(0)}\\text{ €}}` }
+                ]
+              };
+            }
+          }
+        ]
       },
-      {
-        id: 3,
-        title: "Question 3 (PVGO)",
-        generate: () => {
-          const beta = parseFloat(((Math.random() * 0.8) + 0.6).toFixed(2)); // 0.60 to 1.40
-          const e_rm = (Math.floor(Math.random() * 6) + 10) / 100; // 10% to 15%
-          const rf = (Math.floor(Math.random() * 20) + 5) / 1000; // 0.5% to 2.5%
-          const e1 = Math.floor(Math.random() * 10) + 8; // 8 to 17
-          const p0 = Math.floor(Math.random() * 80) + 120; // 120 to 200
-          
-          const k = rf + beta * (e_rm - rf);
-          const p0_no_growth = e1 / k;
-          const pvgo = p0 - p0_no_growth;
-
-          return {
-            text: `Firm B's shares have a CAPM beta of <b>${beta}</b>, the expected rate of return on the market portfolio is <b>${(e_rm*100).toFixed(1)} percent</b> per year, risk-free rate is <b>${(rf*100).toFixed(1)} percent</b> per year. Next year's expected earnings for firm B is <b>${e1} euro/share</b>. Today's stock price for firm B is <b>${p0} euro/share</b>. What is the present value of the growth opportunities (PVGO) for firm B as of today (at t=0)?`,
-            target: pvgo,
-            params: { beta, e_rm, rf, e1, p0, k, p0_no_growth },
-            formula: "$$k = r_f + \\beta \\times (E(r_M) - r_f) \\quad \\text{and} \\quad PVGO_0 = P_0 - \\frac{E_1}{k}$$",
-            getSteps: (p) => [
-              `Calculate required rate $k$ (CAPM): $k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = \\mathbf{${(p.k*100).toFixed(4)}\\%}$`,
-              `Calculate value without growth ($P_0^{\\text{no growth}}$): $P_0^{\\text{no growth}} = \\frac{${p.e1}}{${p.k.toFixed(4)}} = ${(p.p0_no_growth).toFixed(4)}\\text{ €}$`,
-              `Isolate PVGO: $PVGO_0 = ${p.p0} - ${(p.p0_no_growth).toFixed(4)} = \\mathbf{${(p.p0 - p.p0_no_growth).toFixed(4)}\\text{ €}}$`
-            ]
-          };
-        }
+      'mock-quiz-4': {
+        id: 'mock-quiz-4',
+        title: 'Mock Quiz 4',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'violet',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — Zero-Coupon YTM',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const N = 1000;
+              const T = Math.floor(Math.random() * 11) + 18;
+              const yPct = (Math.floor(Math.random() * 90) + 40) / 100;
+              const y = yPct / 100;
+              const z0 = Math.round(N / Math.pow(1 + y, T));
+              const yCalc = Math.pow(N / z0, 1 / T) - 1;
+              return {
+                text: `A government zero-coupon bond Z has a par (face) value of <b>${N} euros</b> and it is exactly <b>${T} years</b> away from maturity. What is the yield-to-maturity (y) if its market price today (at t=0) is <b>${z0} euros</b>? <span class="text-sm font-semibold">Enter y as a decimal with four digits after the decimal point (e.g. 0.0500 for 5.00%, not 5% or 5.00%).</span>`,
+                target: yCalc,
+                params: { N, T, z0, yCalc },
+                formula: '$$Z_0 = \\frac{N}{(1+y)^T} \\implies y = \\left(\\frac{N}{Z_0}\\right)^{1/T} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Given', latex: `N = ${p.N}\\text{ €},\\quad T = ${p.T},\\quad Z_0 = ${p.z0}\\text{ €}` },
+                  { caption: 'Ratio N / Z₀', latex: `\\frac{N}{Z_0} = \\frac{${p.N}}{${p.z0}} = ${(p.N / p.z0).toFixed(6)}` },
+                  { caption: 'Yield-to-maturity', latex: `y = \\left(\\frac{${p.N}}{${p.z0}}\\right)^{1/${p.T}} - 1 = ${p.yCalc.toFixed(6)}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.yCalc.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — Coupon Bond Price (YTM)',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = 1000;
+              const T = Math.floor(Math.random() * 10) + 12;
+              const couponPct = Math.floor(Math.random() * 4) + 4;
+              const yPct = couponPct + Math.floor(Math.random() * 5) + 2;
+              const y = yPct / 100;
+              const C = (couponPct / 100) * N;
+              const discFactor = Math.pow(1 + y, T);
+              const pvCoupons = (C / y) * (1 - 1 / discFactor);
+              const pvPrincipal = N / discFactor;
+              const p0 = pvCoupons + pvPrincipal;
+              return {
+                text: `Find the price at t=0 of a government coupon-paying bond that matures in exactly <b>${T} years</b> from today (t=0), with a coupon rate of <b>${couponPct} percent</b> per year (annual coupon payments), and a yield-to-maturity of <b>${yPct} percent</b> per year. Par (face) value is <b>${N} euros</b>. <span class="text-sm text-slate-500">(Round to 2 decimal places, e.g. 1234.57.)</span>`,
+                target: p0,
+                params: { N, T, couponPct, yPct, y, C, pvCoupons, pvPrincipal, p0, discFactor },
+                formula: '$$P_0 = \\frac{C}{y}\\left(1 - \\frac{1}{(1+y)^T}\\right) + \\frac{N}{(1+y)^T}$$',
+                getSteps: (p) => [
+                  { caption: 'Annual coupon', latex: `C = ${p.couponPct}\\% \\times ${p.N} = ${p.C}\\text{ €},\\quad y = ${p.yPct}\\% = ${p.y}` },
+                  { caption: 'PV of coupons', latex: `\\frac{C}{y}\\left(1 - \\frac{1}{(1+y)^${p.T}}\\right) = ${p.pvCoupons.toFixed(6)}\\text{ €}` },
+                  { caption: 'PV of principal', latex: `\\frac{${p.N}}{(1+y)^${p.T}} = \\frac{${p.N}}{${p.discFactor.toFixed(6)}} = ${p.pvPrincipal.toFixed(6)}\\text{ €}` },
+                  { caption: 'Result', latex: `P_0 = ${p.pvCoupons.toFixed(2)} + ${p.pvPrincipal.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — Bond Price (Term Structure)',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = 1000;
+              const T = 3;
+              const C = 60;
+              const r1Pct = Math.floor(Math.random() * 2) + 1;
+              const r2Pct = Math.floor(Math.random() * 4) + 4;
+              const r3Pct = Math.floor(Math.random() * 4) + 6;
+              const r1 = r1Pct / 100;
+              const r2 = r2Pct / 100;
+              const r3 = r3Pct / 100;
+              const pv1 = C / (1 + r1);
+              const pv2 = C / Math.pow(1 + r2, 2);
+              const pv3 = (C + N) / Math.pow(1 + r3, 3);
+              const p0 = pv1 + pv2 + pv3;
+              return {
+                text: `Consider a government coupon-paying bond with maturity <b>T = ${T} years</b> from now, annual coupon payments of <b>${C} euros</b> once a year, and par value <b>${N} euros</b>. The term structure is \\(r_1 = ${r1Pct}\\%\\) (year 1), \\(r_2 = ${r2Pct}\\%\\) (year 2), and \\(r_3 = ${r3Pct}\\%\\) (year 3). Determine the bond price today (t=0). <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: p0,
+                params: { N, T, C, r1Pct, r2Pct, r3Pct, r1, r2, r3, pv1, pv2, pv3, p0 },
+                formula: '$$P_0 = \\frac{C}{1+r_1} + \\frac{C}{(1+r_2)^2} + \\frac{C+N}{(1+r_3)^3}$$',
+                getSteps: (p) => [
+                  { caption: 'Discount year 1', latex: `\\frac{${p.C}}{1+r_1} = \\frac{${p.C}}{${(1 + p.r1).toFixed(2)}} = ${p.pv1.toFixed(6)}\\text{ €}` },
+                  { caption: 'Discount year 2', latex: `\\frac{${p.C}}{(1+r_2)^2} = ${p.pv2.toFixed(6)}\\text{ €}` },
+                  { caption: 'Discount year 3 (coupon + principal)', latex: `\\frac{${p.C + p.N}}{(1+r_3)^3} = ${p.pv3.toFixed(6)}\\text{ €}` },
+                  { caption: 'Result', latex: `P_0 = ${p.pv1.toFixed(2)} + ${p.pv2.toFixed(2)} + ${p.pv3.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — Forward Rate',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const t = 5;
+              const T = 7;
+              const rTPct = Math.floor(Math.random() * 4) + 7;
+              const r_tPct = rTPct - Math.floor(Math.random() * 3) - 3;
+              const r_t = r_tPct / 100;
+              const r_T = rTPct / 100;
+              const factorT = Math.pow(1 + r_T, T);
+              const factorTt = Math.pow(1 + r_t, t);
+              const fwd = Math.sqrt(factorT / factorTt) - 1;
+              return {
+                text: `Today (at t=0) the <b>${t}-year</b> spot rate is <b>${r_tPct} percent</b> per annum, while the <b>${T}-year</b> spot rate is <b>${rTPct} percent</b> per annum. What is the forward interest rate (per annum) expected between dates <b>${t}</b> and <b>${T}</b>? <span class="text-sm font-semibold">Enter as a decimal (e.g. 12.34% → <b>0.1234</b>).</span>`,
+                target: fwd,
+                params: { t, T, r_tPct, rTPct, r_t, r_T, factorT, factorTt, fwd },
+                formula: '(1+r_T)^T = (1+r_t)^t (1+f_{t \\to T})^{T-t} \\implies f_{t \\to T} = \\sqrt[\\,T-t\\,]{\\frac{(1+r_T)^T}{(1+r_t)^t}} - 1',
+                getSteps: (p) => [
+                  { caption: 'Compound factors', latex: `(1+r_${p.T})^{${p.T}} = ${p.factorT.toFixed(6)},\\quad (1+r_${p.t})^{${p.t}} = ${p.factorTt.toFixed(6)}` },
+                  { caption: 'Two-year forward factor', latex: `(1+f_{${p.t}\\to ${p.T}})^${p.T - p.t} = \\frac{${p.factorT.toFixed(6)}}{${p.factorTt.toFixed(6)}} = ${(p.factorT / p.factorTt).toFixed(6)}` },
+                  { caption: 'Forward rate (per annum)', latex: `f_{${p.t}\\to ${p.T}} = \\sqrt{\\frac{${p.factorT.toFixed(4)}}{${p.factorTt.toFixed(4)}}} - 1 = ${p.fwd.toFixed(6)}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.fwd.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Flat Curve Spot Rate',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const N = 1000;
+              const couponPct = Math.floor(Math.random() * 6) + 10;
+              const y = couponPct / 100;
+              const T = Math.floor(Math.random() * 15) + 40;
+              const targetMaturity = Math.floor(Math.random() * 15) + 30;
+              const p0 = N;
+              const rSpot = y;
+              return {
+                text: `The yield curve based on government zero-coupon bonds is completely flat. A government coupon-paying bond B has face value <b>${N} euros</b>, annual coupon frequency of one per year, and exactly <b>${T} years</b> until maturity. Its price today is <b>${p0} euros</b> (at par). The annual coupon rate is <b>${couponPct} percent</b>. What must be the <b>${targetMaturity}-year</b> government zero-coupon bond rate on a per-annum basis? <span class="text-sm font-semibold">Enter as a decimal with four digits (e.g. 1% → <b>0.0100</b>).</span>`,
+                target: rSpot,
+                params: { N, couponPct, y, T, targetMaturity, p0, rSpot },
+                formula: '$$\\text{At par: } P_0 = N \\implies c = y \\text{; flat curve } \\Rightarrow r_t = c \\text{ for all maturities } t$$',
+                getSteps: (p) => [
+                  { caption: 'Bond trades at par ⇒ coupon rate equals YTM', latex: `P_0 = N = ${p.p0}\\text{ €} \\implies y = c = ${p.couponPct}\\% = ${p.y.toFixed(4)}` },
+                  { caption: 'Flat yield curve', latex: `r_{${p.targetMaturity}} = r_{${p.T}} = y = \\mathbf{${p.rSpot.toFixed(4)}} \\text{ (decimal)}` }
+                ]
+              };
+            }
+          }
+        ]
       },
-      {
-        id: 4,
-        title: "Question 4 (Stock Price P1 with Special Dividend)",
-        generate: () => {
-          const rf = (Math.floor(Math.random() * 20)) / 1000; // 0% to 2%
-          const beta = parseFloat(((Math.random() * 0.8) + 0.4).toFixed(2)); // 0.4 to 1.2
-          const e_rm = (Math.floor(Math.random() * 6) + 10) / 100; // 10% to 15%
-          const d_reg = Math.floor(Math.random() * 6) + 5; // 5 to 10
-          const d_spec = parseFloat((Math.random() * 8 + 5).toFixed(1)); // 5.0 to 13.0
-
-          const k = rf + beta * (e_rm - rf);
-          const p1 = (d_reg / k) + (d_spec / (1 + k));
-
-          return {
-            text: `Firm OilCo is expected to pay a constant regular dividend of <b>${d_reg} euro/year</b> in every year forever starting with a year from t=0 (i.e., at dates t=1, 2, 3,..., ∞) -- these dividends do not grow. OilCo is expected to pay a one-time special dividend of <b>${d_spec} euro/share</b> at date t=2 (on top of the regular dividend). Assume that CAPM holds: risk-free rate is <b>${(rf*100).toFixed(1)} percent</b>, OilCo has a beta of <b>${beta}</b>, the expected return on the market is <b>${(e_rm*100).toFixed(1)} percent</b>. What is the company's expected stock price at date t=1 right after the payment of the first regular dividend?`,
-            target: p1,
-            params: { rf, beta, e_rm, d_reg, d_spec, k },
-            formula: "$$P_1 = \\frac{D_{\\text{regular}}}{k} + \\frac{D_{\\text{special}}}{1 + k}$$",
-            getSteps: (p) => [
-              `Calculate required return $k$: $k = ${p.rf} + ${p.beta} \\times (${p.e_rm} - ${p.rf}) = \\mathbf{${(p.k*100).toFixed(2)}\\%}$`,
-              `Valuation of regular perpetuity at $t=1$: $\\frac{${p.d_reg}}{${p.k.toFixed(4)}} = ${(p.d_reg / p.k).toFixed(4)}$`,
-              `Discount special dividend from $t=2$ back to $t=1$: $\\frac{${p.d_spec}}{1 + ${p.k.toFixed(4)}} = ${(p.d_spec / (1 + p.k)).toFixed(4)}$`,
-              `Sum both components: $P_1 = ${(p.d_reg / p.k).toFixed(4)} + ${(p.d_spec / (1 + p.k)).toFixed(4)} = \\mathbf{${p1.toFixed(4)}\\text{ €}}$`
-            ]
-          };
-        }
+      'mock-quiz-5': {
+        id: 'mock-quiz-5',
+        title: 'Mock Quiz 5',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'amber',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — 1-Year HPR (Zero-Coupon)',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const N = 1000;
+              const T = Math.floor(Math.random() * 8) + 12;
+              const y0Pct = (Math.floor(Math.random() * 50) + 20) / 10;
+              const y1Pct = (Math.floor(Math.random() * 30) + 5) / 10;
+              const y0 = y0Pct / 100;
+              const y1 = y1Pct / 100;
+              const p0 = N / Math.pow(1 + y0, T);
+              const p1 = N / Math.pow(1 + y1, T - 1);
+              const hpr = p1 / p0 - 1;
+              const hprShortcut = Math.pow(1 + y0, T) / Math.pow(1 + y1, T - 1) - 1;
+              return {
+                text: `Today (at t=0), a <b>${T}-year</b> US government default-risk-free zero-coupon bond with par value <b>N = ${N} $</b> has a yield-to-maturity of <b>${y0Pct.toFixed(1)}%</b> per year. Exactly one year later (at t=1), the same bond has a yield-to-maturity of <b>${y1Pct.toFixed(1)}%</b> per year. What is your <b>1-year holding period return (HPR)</b> if you buy at t=0 and sell at t=1? <span class="text-sm font-semibold">Enter as a decimal (e.g. +1.23% → <b>0.0123</b>, −1.23% → <b>−0.0123</b>).</span>`,
+                target: hpr,
+                params: { N, T, y0, y1, y0Pct, y1Pct, p0, p1, hpr, hprShortcut },
+                formula: '$$P_0 = \\frac{N}{(1+y_0)^T},\\quad P_1 = \\frac{N}{(1+y_1)^{T-1}},\\quad \\text{HPR} = \\frac{P_1}{P_0} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Price at t = 0', latex: `P_0 = \\frac{${p.N}}{(1+y_0)^{${p.T}}} = ${p.p0.toFixed(6)}\\text{ \\$}` },
+                  { caption: 'Price at t = 1 (T−1 years left)', latex: `P_1 = \\frac{${p.N}}{(1+y_1)^{${p.T - 1}}} = ${p.p1.toFixed(6)}\\text{ \\$}` },
+                  { caption: 'Holding period return', latex: `\\text{HPR} = \\frac{${p.p1.toFixed(4)}}{${p.p0.toFixed(4)}} - 1 = \\mathbf{${p.hpr.toFixed(6)}}` },
+                  { caption: 'Shortcut (N cancels)', latex: `\\text{HPR} = \\frac{(1+y_0)^{${p.T}}}{(1+y_1)^{${p.T - 1}}} - 1 = \\mathbf{${p.hprShortcut.toFixed(4)}} \\text{ (decimal)}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — 5-Year Spot Rate (No Arbitrage)',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const r4Pct = (Math.floor(Math.random() * 35) + 30) / 10;
+              const fwdPct = (Math.floor(Math.random() * 60) + 50) / 10;
+              const r4 = r4Pct / 100;
+              const fwd = fwdPct / 100;
+              const factor5 = Math.pow(1 + r4, 4) * (1 + fwd);
+              const r5 = Math.pow(factor5, 1 / 5) - 1;
+              return {
+                text: `In the US government zero-coupon (STRIPS) market today (t=0), the required return on a <b>4-year</b> zero-coupon bond is <b>${r4Pct.toFixed(1)}%</b> per year. The <b>1-year forward rate</b> starting at t=4 is <b>${fwdPct.toFixed(1)}%</b> per year. What is the required return on a <b>5-year</b> zero-coupon bond (per year) such that there is no arbitrage? <span class="text-sm font-semibold">Enter as a decimal (four digits after the decimal point).</span>`,
+                target: r5,
+                params: { r4Pct, fwdPct, r4, fwd, factor5, r5 },
+                formula: '(1+r_5)^5 = (1+r_4)^4 (1+f_{4 \\to 5}) \\implies r_5 = \\left[(1+r_4)^4 (1+f_{4 \\to 5})\\right]^{1/5} - 1',
+                getSteps: (p) => [
+                  { caption: 'No-arbitrage spot/forward link', latex: `(1+r_5)^5 = (1+r_4)^4 \\times (1+f_{4 \\to 5})` },
+                  { caption: '5-year compounding factor', latex: `(1+r_5)^5 = (1+r_4)^4 (1+f_{4 \\to 5}) = ${p.factor5.toFixed(8)}` },
+                  { caption: 'Annual 5-year spot rate', latex: `r_5 = (${p.factor5.toFixed(6)})^{1/5} - 1 = \\mathbf{${p.r5.toFixed(6)}}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.r5.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — No-Arbitrage Price (Law of One Price)',
+            answerKind: 'currency',
+            decimals: 0,
+            generate: () => {
+              const face1 = 100;
+              const face2 = 50;
+              const face3 = 50;
+              const p2 = Math.floor(Math.random() * 11) + 128;
+              const p3 = Math.floor(Math.random() * 7) + 45;
+              const n2 = 1;
+              const n3 = -1;
+              const p1 = n2 * p2 + n3 * p3;
+              return {
+                text: `<p class="mb-2 font-medium">Consider the following bonds (same AA credit rating):</p>
+                  <p class="mb-1"><b>Bond1:</b> maturity 2 years; face value <b>${face1}</b>; coupon rate <b>0%</b>; price = ?</p>
+                  <p class="mb-1"><b>Bond2:</b> maturity 2 years; face value <b>${face2}</b>; coupon rate <b>100%</b> per year; price = <b>${p2}</b></p>
+                  <p class="mb-1"><b>Bond3:</b> maturity 1 year; face value <b>${face3}</b>; coupon rate <b>0%</b>; price = <b>${p3}</b></p>
+                  <p class="mt-2">Replicate Bond1's cash flows using Bond2 and Bond3 only (ignore bonds with a different credit rating). What is the no-arbitrage price of Bond1?</p>`,
+                target: p1,
+                params: { face1, face2, face3, p2, p3, n2, n3, p1 },
+                formula: '$$P_{\\text{Bond1}} = n_2 \\times P_{\\text{Bond2}} + n_3 \\times P_{\\text{Bond3}}$$',
+                getSteps: (p) => [
+                  { caption: 'Bond cash flows (AA)', latex: `\\text{Bond1: } t=1\\!:\\!0,\\; t=2\\!:\\!${p.face1} \\quad \\text{Bond2: } t=1\\!:\\!${p.face2},\\; t=2\\!:\\!${2 * p.face2} \\quad \\text{Bond3: } t=1\\!:\\!${p.face3}` },
+                  { caption: 'Replication units', latex: `t=2:\\; ${p.face2} \\times n_2 = ${p.face1} \\Rightarrow n_2 = ${p.n2} \\quad;\\quad t=1:\\; ${p.face2} n_2 + ${p.face3} n_3 = 0 \\Rightarrow n_3 = ${p.n3}` },
+                  { caption: 'Law of One Price', latex: `P_{\\text{Bond1}} = ${p.n2} \\times ${p.p2} + (${p.n3}) \\times ${p.p3} = \\mathbf{${p.p1}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — 1-Year Forward Rate f₄→₅',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const r4Pct = (Math.floor(Math.random() * 30) + 25) / 10;
+              const bps = [15, 20, 25, 30, 35, 40][Math.floor(Math.random() * 6)];
+              const r5Pct = r4Pct + bps / 100;
+              const r4 = r4Pct / 100;
+              const r5 = r5Pct / 100;
+              const factor5 = Math.pow(1 + r5, 5);
+              const factor4 = Math.pow(1 + r4, 4);
+              const fwd = factor5 / factor4 - 1;
+              return {
+                text: `Today (t=0), the <b>4-year</b> spot rate on the government yield curve is <b>${r4Pct.toFixed(1)}%</b> per year. The <b>5-year</b> zero-coupon rate is <b>${bps} basis points</b> higher than the 4-year rate. What is <b>f₄→₅</b>, the 1-year forward rate starting at year 4? <span class="text-sm font-semibold">Enter as a decimal with four digits (e.g. 1.23% → <b>0.0123</b>).</span>`,
+                target: fwd,
+                params: { r4Pct, r5Pct, bps, r4, r5, factor5, factor4, fwd },
+                formula: '$$f_{4 \\to 5} = \\frac{(1+r_5)^5}{(1+r_4)^4} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Spot rates', latex: `r_4 = ${p.r4Pct.toFixed(1)}\\% = ${p.r4},\\quad r_5 = ${p.r5Pct.toFixed(2)}\\% = ${p.r5.toFixed(4)}\\; (${p.bps}\\text{ bps above } r_4)` },
+                  { caption: 'Compound factors', latex: `(1+r_5)^5 = ${p.factor5.toFixed(8)},\\quad (1+r_4)^4 = ${p.factor4.toFixed(8)}` },
+                  { caption: 'Forward rate', latex: `f_{4 \\to 5} = \\frac{${p.factor5.toFixed(6)}}{${p.factor4.toFixed(6)}} - 1 = \\mathbf{${p.fwd.toFixed(6)}}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.fwd.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Short Forward Payoff (Gold)',
+            answerKind: 'whole_euros',
+            decimals: 0,
+            generate: () => {
+              const contracts = Math.floor(Math.random() * 40) + 40;
+              const sizeG = Math.floor(Math.random() * 50) + 170;
+              const fwdPrice = Math.floor(Math.random() * 15) + 35;
+              const spotAtMat = fwdPrice + Math.floor(Math.random() * 12) + 3;
+              const totalQty = contracts * sizeG;
+              const payoff = totalQty * (fwdPrice - spotAtMat);
+              return {
+                text: `You hold <b>${contracts} short</b> forward contracts on gold. Each contract covers <b>${sizeG} grams</b>. Maturity is in <b>16 months</b>; settlement is cash. The forward price is <b>F(0,16m) = ${fwdPrice} €/gram</b>. At maturity, spot gold is <b>S = ${spotAtMat} €/gram</b>. What is your total payoff in euros? <span class="text-sm font-semibold">Enter a whole number of euros only (no decimal point, no € sign, no commas).</span>`,
+                target: payoff,
+                params: { contracts, sizeG, fwdPrice, spotAtMat, totalQty, payoff },
+                formula: '$$\\text{Payoff}_{\\text{short}} = \\text{\\# contracts} \\times \\text{size per contract} \\times (F_{0,T} - S_T)$$',
+                getSteps: (p) => [
+                  { caption: 'Total quantity (grams)', latex: `${p.contracts} \\times ${p.sizeG} = ${p.totalQty}\\text{ g}` },
+                  { caption: 'Payoff per gram (short)', latex: `F_{0,T} - S_T = ${p.fwdPrice} - ${p.spotAtMat} = ${p.fwdPrice - p.spotAtMat}\\text{ €/g}` },
+                  { caption: 'Total payoff', latex: `\\text{Payoff}_{\\text{short}} = ${p.totalQty} \\times (${p.fwdPrice - p.spotAtMat}) = \\mathbf{${p.payoff}}\\text{ €}` }
+                ]
+              };
+            }
+          }
+        ]
       },
-      {
-        id: 5,
-        title: "Question 5 (Dividend Cancellation Impact)",
-        generate: () => {
-          const d1 = Math.floor(Math.random() * 25) + 20; // 20 to 45
-          const k = (Math.floor(Math.random() * 10) + 15) / 100; // 15% to 24%
-          const delta_p0 = -d1 / (1 + k);
-
-          return {
-            text: `As of last night, the utility company C was expected to pay a dividend of <b>${d1} euro/share</b> next year at date t=1, and the level of these dividends is expected to stay constant forever (i.e., dividends do not grow). The required rate of return on C shares is <b>${(k*100).toFixed(1)} percent</b> per year. This morning the management announces that they will skip next year's dividend at t=1 but that the company will resume paying the constant dividends starting with date t=2. What is the stock price change at the announcement?`,
-            target: delta_p0,
-            params: { d1, k },
-            formula: "$$\\Delta P_0 = - \\frac{D_1}{1 + k}$$",
-            getSteps: (p) => [
-              `Principle: The skipped dividend at $t=1$ equals the present value lost from $t=1$ discounted back to $t=0$.`,
-              `Calculate direct loss: $\\Delta P_0 = - \\frac{${p.d1}}{1 + ${p.k}} = - \\frac{${p.d1}}{${(1+p.k).toFixed(2)}} = \\mathbf{${delta_p0.toFixed(4)}\\text{ €}}$`
-            ]
-          };
-        }
+      'mock-quiz-6': {
+        id: 'mock-quiz-6',
+        title: 'Mock Quiz 6',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'rose',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — No-Arbitrage Price (BB Annuity)',
+            answerKind: 'currency',
+            decimals: 0,
+            generate: () => {
+              const N = 1000;
+              const couponPct = 5;
+              const couponPay = (couponPct / 100) * N;
+              const p3 = Math.floor(Math.random() * 16) + 1012;
+              const p4 = p3 - couponPay;
+              const price = p3 - p4;
+              return {
+                text: `<p class="mb-2 font-medium">Bonds (annual coupon frequency, 2-year maturity, face value ${N} euros):</p>
+                  <p class="mb-1 text-sm">Bond 3 — BB-rated, ${couponPct}% coupon, price = <b>${p3}</b> €</p>
+                  <p class="mb-2 text-sm">Bond 4 — BB-rated, 0% coupon, price = <b>${p4}</b> €</p>
+                  <p class="mt-2">Annuity A is BB-rated: it pays <b>${couponPay} euros/year</b> at the end of each year for <b>2 years</b> (no final principal payment). Replicate its cash flows using Bond 3 and Bond 4 only. What is the no-arbitrage price of Annuity A?</p>`,
+                target: price,
+                params: { N, couponPct, couponPay, p3, p4, price },
+                formula: '$$\\text{Price}(\\text{Annuity A}) = \\text{Price}(\\text{Bond 3}) - \\text{Price}(\\text{Bond 4})$$',
+                getSteps: (p) => [
+                  { caption: 'Annuity A cash flows (BB)', latex: `t=1:\\; ${p.couponPay}\\text{ €},\\quad t=2:\\; ${p.couponPay}\\text{ €}` },
+                  { caption: 'Bond 3 (BB, 5%): CF₁ = 50, CF₂ = 1,050', latex: `\\text{Long 1 Bond 3: } t=1 \\Rightarrow ${p.couponPay},\\; t=2 \\Rightarrow ${p.couponPay + p.N}` },
+                  { caption: 'Bond 4 (BB, 0%): subtract 1 unit', latex: `t=1:\\; ${p.couponPay} - 0 = ${p.couponPay},\\quad t=2:\\; ${p.couponPay + p.N} - ${p.N} = ${p.couponPay}` },
+                  { caption: 'Law of One Price', latex: `\\text{Price}(A) = ${p.p3} - ${p.p4} = \\mathbf{${p.price}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — Zero-Coupon Price (Flat Curve)',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = 1000;
+              const yPct = (Math.floor(Math.random() * 4) + 9);
+              const y = yPct / 100;
+              const months = Math.floor(Math.random() * 41) + 240;
+              const T = months / 12;
+              const p0 = N / Math.pow(1 + y, T);
+              const denom = Math.pow(1 + y, T);
+              return {
+                text: `The government zero-coupon yield curve is <b>flat at ${yPct}%</b> per year for all maturities. What is the price today of a government zero-coupon bond with face value <b>${N} euros</b> and exactly <b>${months} months</b> until maturity? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: p0,
+                params: { N, yPct, y, months, T, p0, denom },
+                formula: '$$P_0 = \\frac{N}{(1+y)^T}, \\quad T = \\frac{\\text{months}}{12}$$',
+                getSteps: (p) => [
+                  { caption: 'Maturity in years', latex: `T = \\frac{${p.months}}{12} = ${p.T.toFixed(4)}\\text{ years}` },
+                  { caption: 'Discount factor', latex: `(1+y)^T = (1 + ${p.y})^{${p.T.toFixed(4)}} = ${p.denom.toFixed(6)}` },
+                  { caption: 'Result', latex: `P_0 = \\frac{${p.N}}{${p.denom.toFixed(4)}} = \\mathbf{${p.p0.toFixed(2)}\\text{ €}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — Coupon Bond Price (YTM)',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = Math.floor(Math.random() * 4) * 200 + 1494;
+              const couponPct = 5;
+              const yPct = Math.floor(Math.random() * 6) + 12;
+              const T = Math.floor(Math.random() * 6) + 20;
+              const y = yPct / 100;
+              const C = (couponPct / 100) * N;
+              const discFactor = Math.pow(1 + y, T);
+              const pvCoupons = (C / y) * (1 - 1 / discFactor);
+              const pvPrincipal = N / discFactor;
+              const p0 = pvCoupons + pvPrincipal;
+              return {
+                text: `What is the price at t=0 of a coupon bond with face value <b>${N} euros</b>, coupon rate <b>${couponPct}%</b> per year (annual payments), yield-to-maturity <b>${yPct}%</b> per year, and maturity <b>${T} years</b>? <span class="text-sm font-semibold">Enter with two decimals (e.g. 610.04), no currency sign.</span>`,
+                target: p0,
+                params: { N, couponPct, yPct, y, T, C, pvCoupons, pvPrincipal, p0, discFactor },
+                formula: '$$P_0 = \\frac{C}{y}\\left(1 - \\frac{1}{(1+y)^T}\\right) + \\frac{N}{(1+y)^T}$$',
+                getSteps: (p) => [
+                  { caption: 'Annual coupon', latex: `C = ${p.couponPct}\\% \\times ${p.N} = ${p.C.toFixed(2)}\\text{ €}` },
+                  { caption: 'PV of coupon annuity', latex: `\\frac{C}{y}\\left(1 - \\frac{1}{(1+y)^{${p.T}}}\\right) = ${p.pvCoupons.toFixed(4)}\\text{ €}` },
+                  { caption: 'PV of face value', latex: `\\frac{${p.N}}{(1+y)^{${p.T}}} = ${p.pvPrincipal.toFixed(4)}\\text{ €}` },
+                  { caption: 'Result', latex: `P_0 = ${p.pvCoupons.toFixed(2)} + ${p.pvPrincipal.toFixed(2)} = \\mathbf{${p.p0.toFixed(2)}}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — Interest-Rate Sensitivity (Maturity)',
+            answerKind: 'integer',
+            generate: () => {
+              const N = 1000;
+              const couponPct = 13;
+              const yPct = 10;
+              const tShort = Math.floor(Math.random() * 3) + 2;
+              const tLong = Math.floor(Math.random() * 10) + 12;
+              const answer = Math.max(tShort, tLong);
+              return {
+                text: `Bond A has face value <b>${N} euros</b>, coupon rate <b>${couponPct}%</b> per year, maturity <b>${tShort} years</b>, YTM <b>${yPct}%</b>. Bond B has the same face value, coupon rate, and YTM but maturity <b>${tLong} years</b>. Which bond has <b>higher</b> sensitivity to interest-rate changes? Enter the <b>time to maturity (in years)</b> of that bond only (e.g. enter <b>16</b> for 16 years).`,
+                target: answer,
+                params: { N, couponPct, yPct, tShort, tLong, answer },
+                formula: '$$\\text{All else equal, duration } D_{\\text{Mod}} \\uparrow \\text{ with maturity } T \\Rightarrow \\text{ longer maturity } \\Rightarrow \\text{ higher sensitivity}$$',
+                getSteps: (p) => [
+                  { caption: 'Same coupon, YTM, face value — only maturity differs', latex: `T_A = ${p.tShort}\\text{ yr},\\quad T_B = ${p.tLong}\\text{ yr}` },
+                  { caption: 'Modified duration increases with T', latex: `D_{\\text{Mod}}(B) > D_{\\text{Mod}}(A) \\text{ because } ${p.tLong} > ${p.tShort}` },
+                  { caption: 'Answer (maturity of more sensitive bond)', latex: `\\mathbf{${p.answer}}\\text{ years}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Short Forward Payoff (Apple)',
+            answerKind: 'integer',
+            generate: () => {
+              const contracts = Math.floor(Math.random() * 30) + 70;
+              const sharesPer = 100;
+              const f0 = Math.floor(Math.random() * 20) + 140;
+              const spotDrop = Math.floor(Math.random() * 15) + 8;
+              const sT = f0 - spotDrop;
+              const totalShares = contracts * sharesPer;
+              const payoff = totalShares * (f0 - sT);
+              return {
+                text: `One week ago you sold <b>${contracts} short</b> forward contracts on Apple Inc. shares (${sharesPer} shares per contract). Delivery price was <b>F = ${f0} USD/share</b>. At maturity, the spot price is <b>${sT} USD/share</b>. What is your <b>total payoff in USD</b>? <span class="text-sm font-semibold">Enter a whole number only (e.g. 105600, no $ sign or commas).</span>`,
+                target: payoff,
+                params: { contracts, sharesPer, f0, sT, totalShares, payoff, spotDrop },
+                formula: '$$\\text{Payoff}_{\\text{short}} = N_{\\text{contracts}} \\times m \\times (F_0 - S_T)$$',
+                getSteps: (p) => [
+                  { caption: 'Total shares', latex: `${p.contracts} \\times ${p.sharesPer} = ${p.totalShares}\\text{ shares}` },
+                  { caption: 'Payoff per share (short)', latex: `F_0 - S_T = ${p.f0} - ${p.sT} = ${p.f0 - p.sT}\\text{ USD/share}` },
+                  { caption: 'Total payoff', latex: `${p.totalShares} \\times ${p.f0 - p.sT} = \\mathbf{${p.payoff}}\\text{ USD}` }
+                ]
+              };
+            }
+          }
+        ]
       }
-    ];
+    };
 
-    // App State
-    let shuffledIndices = [];
-    let currentOrderIndex = 0;
-    let currentData = null;
+    let activeQuizId = 'mock-quiz-2';
     let timerInterval = null;
-    let timeLeft = 180; // 3 minutes
 
-    // Shuffle questions array randomly
-    function shuffleQuestions() {
-      shuffledIndices = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
-      currentOrderIndex = 0;
+    /** Render LaTeX like the reference formula bar (display math, centered). */
+    function wrapDisplayMath(latex) {
+      return `<div class="formula-scroll text-center py-2 text-xs sm:text-sm md:text-base">${latex}</div>`;
     }
 
-    // Load question on screen
-    function loadQuestion() {
-      clearInterval(timerInterval);
-      timeLeft = 180;
-      updateTimerDisplay();
-      startTimer();
+    function stripDisplayDelimiters(formulaStr) {
+      return formulaStr.replace(/^\$\$|\$\$$/g, '').trim();
+    }
 
-      const templateIndex = shuffledIndices[currentOrderIndex];
-      const template = questionTemplates[templateIndex];
-      currentData = template.generate();
+    function renderFormulaHtml(formulaStr) {
+      return wrapDisplayMath('$$' + stripDisplayDelimiters(formulaStr) + '$$');
+    }
 
-      // UI updates
-      document.getElementById('question-tag').innerText = `Question ${currentOrderIndex + 1} / 5 - ${template.title}`;
-      document.getElementById('question-text').innerHTML = currentData.text;
-      
-      // Reset inputs & feedback
+    /** Steps: { caption?: string, latex?: string } — latex typeset with $$ like the cheat sheet. */
+    function renderCorrectionSteps(steps) {
+      return steps.map((step) => {
+        const caption = step.caption
+          ? `<p class="text-xs font-semibold text-slate-500 mb-1">${step.caption}</p>`
+          : '';
+        const math = step.latex
+          ? wrapDisplayMath('$$' + step.latex + '$$')
+          : '';
+        return `<div class="correction-step space-y-1 pb-3 border-b border-slate-200 last:border-0 last:pb-0">${caption}${math}</div>`;
+      }).join('');
+    }
+
+    const quizRuntime = {};
+
+    function createRuntimeState(quizId) {
+      return {
+        shuffledIndices: [],
+        currentOrderIndex: 0,
+        currentData: null,
+        currentTemplate: null,
+        timeLeft: QUIZZES[quizId].timerSeconds,
+        sessionCorrect: 0,
+        sessionAttempts: 0,
+        answeredThisQuestion: false,
+        initialized: false
+      };
+    }
+
+    function getState() {
+      if (!quizRuntime[activeQuizId]) {
+        quizRuntime[activeQuizId] = createRuntimeState(activeQuizId);
+      }
+      return quizRuntime[activeQuizId];
+    }
+
+    function getQuiz() {
+      return QUIZZES[activeQuizId];
+    }
+
+    function shuffleQuestions(state, quiz) {
+      state.shuffledIndices = quiz.templates.map((_, i) => i).sort(() => Math.random() - 0.5);
+      state.currentOrderIndex = 0;
+    }
+
+    const UI = {
+      tabBase: 'quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug',
+      btnSecondary: 'theme-btn-secondary w-full sm:w-auto min-h-[44px] px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg border transition',
+      btnValidate: 'theme-btn-primary w-full sm:w-auto min-h-[44px] text-white font-semibold px-6 py-3 sm:py-2 rounded-lg transition shrink-0',
+      btnReveal: 'theme-link text-left text-xs sm:text-sm font-semibold underline min-h-[44px] sm:min-h-0 py-2 sm:py-0',
+      input: 'flex-1 min-w-0 w-full border border-slate-300 rounded-lg px-4 py-3 sm:py-2 focus:ring-2 focus:outline-none text-base sm:text-lg theme-input-ring',
+      questionTag: 'inline-block max-w-full text-[10px] sm:text-xs font-bold tracking-wide uppercase px-2 sm:px-2.5 py-1 rounded-full break-words',
+      timerOk: 'text-xl sm:text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md',
+      timerLow: 'text-xl sm:text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse'
+    };
+
+    const QUIZ_TAB_META = [
+      { id: 'mock-quiz-2', tabId: 'tab-quiz-2', headerId: 'header-quiz-2', activeTab: 'bg-indigo-600 text-white' },
+      { id: 'mock-quiz-3', tabId: 'tab-quiz-3', headerId: 'header-quiz-3', activeTab: 'bg-teal-600 text-white' },
+      { id: 'mock-quiz-4', tabId: 'tab-quiz-4', headerId: 'header-quiz-4', activeTab: 'bg-violet-600 text-white' },
+      { id: 'mock-quiz-5', tabId: 'tab-quiz-5', headerId: 'header-quiz-5', activeTab: 'bg-amber-600 text-white' },
+      { id: 'mock-quiz-6', tabId: 'tab-quiz-6', headerId: 'header-quiz-6', activeTab: 'bg-rose-600 text-white' }
+    ];
+
+    const THEME_STYLES = {
+      indigo: {
+        score: 'font-bold text-indigo-700',
+        secondary: 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100',
+        validate: 'bg-indigo-600 hover:bg-indigo-700',
+        reveal: 'text-indigo-600 hover:text-indigo-800',
+        inputRing: 'focus:ring-indigo-500',
+        correctionBorder: 'border-indigo-100',
+        correctionFormula: 'bg-indigo-50/50 border-indigo-100',
+        tag: 'bg-indigo-100 text-indigo-700',
+        progressActive: 'bg-indigo-600',
+        progressDone: 'bg-indigo-300'
+      },
+      teal: {
+        score: 'font-bold text-teal-700',
+        secondary: 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100',
+        validate: 'bg-teal-600 hover:bg-teal-700',
+        reveal: 'text-teal-700 hover:text-teal-900',
+        inputRing: 'focus:ring-teal-500',
+        correctionBorder: 'border-teal-100',
+        correctionFormula: 'bg-teal-50/50 border-teal-100',
+        tag: 'bg-teal-100 text-teal-800',
+        progressActive: 'bg-teal-600',
+        progressDone: 'bg-teal-300'
+      },
+      violet: {
+        score: 'font-bold text-violet-700',
+        secondary: 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100',
+        validate: 'bg-violet-600 hover:bg-violet-700',
+        reveal: 'text-violet-700 hover:text-violet-900',
+        inputRing: 'focus:ring-violet-500',
+        correctionBorder: 'border-violet-100',
+        correctionFormula: 'bg-violet-50/50 border-violet-100',
+        tag: 'bg-violet-100 text-violet-800',
+        progressActive: 'bg-violet-600',
+        progressDone: 'bg-violet-300'
+      },
+      amber: {
+        score: 'font-bold text-amber-800',
+        secondary: 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100',
+        validate: 'bg-amber-600 hover:bg-amber-700',
+        reveal: 'text-amber-800 hover:text-amber-950',
+        inputRing: 'focus:ring-amber-500',
+        correctionBorder: 'border-amber-100',
+        correctionFormula: 'bg-amber-50/50 border-amber-100',
+        tag: 'bg-amber-100 text-amber-900',
+        progressActive: 'bg-amber-600',
+        progressDone: 'bg-amber-300'
+      },
+      rose: {
+        score: 'font-bold text-rose-700',
+        secondary: 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100',
+        validate: 'bg-rose-600 hover:bg-rose-700',
+        reveal: 'text-rose-700 hover:text-rose-900',
+        inputRing: 'focus:ring-rose-500',
+        correctionBorder: 'border-rose-100',
+        correctionFormula: 'bg-rose-50/50 border-rose-100',
+        tag: 'bg-rose-100 text-rose-800',
+        progressActive: 'bg-rose-600',
+        progressDone: 'bg-rose-300'
+      }
+    };
+
+    function applyTheme(theme) {
+      const t = THEME_STYLES[theme] || THEME_STYLES.indigo;
+      document.getElementById('score-display').className = t.score;
+
+      document.querySelectorAll('.theme-btn-secondary').forEach(el => {
+        el.className = UI.btnSecondary + ' ' + t.secondary;
+      });
+      document.getElementById('btn-validate').className = UI.btnValidate + ' ' + t.validate;
+      document.getElementById('btn-reveal').className = UI.btnReveal + ' ' + t.reveal;
+      document.getElementById('user-answer').className = UI.input + ' ' + t.inputRing;
+
+      const correctionBox = document.getElementById('correction-box');
+      correctionBox.className = 'hidden border-t-2 pt-4 space-y-4 theme-correction-border ' + t.correctionBorder;
+      document.querySelector('.theme-correction-formula').className =
+        'space-y-2 p-3 sm:p-4 rounded-lg border text-xs sm:text-sm theme-correction-formula ' + t.correctionFormula;
+    }
+
+    function updateTabButtons() {
+      QUIZ_TAB_META.forEach(({ id, tabId, headerId, activeTab }) => {
+        const tab = document.getElementById(tabId);
+        const active = id === activeQuizId;
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        tab.className = active
+          ? UI.tabBase + ' shadow-sm ' + activeTab
+          : UI.tabBase + ' text-slate-600 hover:bg-slate-50';
+        document.getElementById(headerId).classList.toggle('hidden', !active);
+      });
+    }
+
+    function renderProgressDots(state, quiz) {
+      const bar = document.getElementById('progress-bar');
+      const theme = THEME_STYLES[quiz.theme] || THEME_STYLES.indigo;
+      const activeClass = theme.progressActive;
+      const doneClass = theme.progressDone;
+      bar.innerHTML = '';
+      for (let i = 0; i < quiz.questionCount; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'h-1.5 sm:h-2 flex-1 max-w-[2rem] sm:max-w-[4rem] rounded-full transition-colors ' +
+          (i === state.currentOrderIndex ? activeClass : i < state.currentOrderIndex ? doneClass : 'bg-slate-200');
+        bar.appendChild(dot);
+      }
+    }
+
+    function formatExpected(value, template) {
+      if (template.answerKind === 'decimal') {
+        return value.toFixed(template.decimals ?? 4) + ' (decimal)';
+      }
+      if (template.answerKind === 'whole_euros') {
+        return Math.round(value) + ' € (whole euros)';
+      }
+      if (template.answerKind === 'integer') {
+        return Math.round(value) + ' (whole number)';
+      }
+      const d = template.decimals ?? 2;
+      return value.toFixed(d) + ' €';
+    }
+
+    function updateAnswerLabel(template) {
+      const label = document.getElementById('answer-label');
+      const hint = document.getElementById('answer-hint');
+      const input = document.getElementById('user-answer');
+      if (template.answerKind === 'decimal') {
+        label.textContent = 'Your Answer (decimal):';
+        hint.textContent = 'Example: for 1.23%, enter 0.0123 (not 1.23).';
+        hint.classList.remove('hidden');
+        input.placeholder = 'e.g. 0.0137';
+      } else if (template.answerKind === 'whole_euros') {
+        label.textContent = 'Your Answer (whole €):';
+        hint.textContent = 'Enter a whole number only (e.g. −79982, no decimal point or € sign).';
+        hint.classList.remove('hidden');
+        input.placeholder = 'e.g. -79982';
+        input.step = '1';
+      } else if (template.answerKind === 'integer') {
+        label.textContent = 'Your Answer (whole number):';
+        hint.textContent = 'Enter a whole number only (e.g. 16 or 105600 — no units or decimals).';
+        hint.classList.remove('hidden');
+        input.placeholder = 'e.g. 16';
+        input.step = '1';
+      } else {
+        label.textContent = 'Your Answer (€):';
+        hint.classList.add('hidden');
+        input.placeholder = template.decimals === 0 ? 'e.g. 1108' : 'e.g. 109.59';
+        input.step = 'any';
+      }
+    }
+
+    function isAnswerCorrect(userVal, expected, template) {
+      if (template.answerKind === 'decimal') {
+        return Math.abs(userVal - expected) < 0.00025 ||
+          (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.015);
+      }
+      if (template.answerKind === 'whole_euros') {
+        return Math.abs(userVal - Math.round(expected)) < 0.5;
+      }
+      if (template.answerKind === 'integer') {
+        return Math.abs(userVal - Math.round(expected)) < 0.5;
+      }
+      const tol = template.decimals === 0 ? 0.5 : 0.05;
+      if (template.decimals === undefined && template.answerKind === 'currency') {
+        return Math.abs(userVal - expected) < 0.1 ||
+          (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.01);
+      }
+      return Math.abs(userVal - expected) < tol ||
+        (expected !== 0 && Math.abs((userVal - expected) / expected) < 0.01);
+    }
+
+    function typesetMath(elements) {
+      if (window.MathJax && MathJax.typesetPromise) {
+        const targets = elements || undefined;
+        MathJax.typesetPromise(targets).catch(() => {});
+      }
+    }
+
+    function syncQuestionUI(state, quiz) {
+      if (!state.currentTemplate || !state.currentData) return;
+      document.getElementById('question-tag').innerText =
+        `${quiz.title} — Question ${state.currentOrderIndex + 1} / ${quiz.questionCount} · ${state.currentTemplate.title}`;
+      const theme = THEME_STYLES[quiz.theme] || THEME_STYLES.indigo;
+      document.getElementById('question-tag').className = UI.questionTag + ' ' + theme.tag;
+      document.getElementById('question-text').innerHTML = state.currentData.text;
+      updateAnswerLabel(state.currentTemplate);
       document.getElementById('user-answer').value = '';
       const feedback = document.getElementById('feedback');
       feedback.classList.add('hidden');
-      feedback.className = "hidden text-sm font-semibold p-3 rounded-lg text-center";
-
-      // Hide correction
+      feedback.className = 'hidden text-sm font-semibold p-3 rounded-lg text-center';
       document.getElementById('correction-box').classList.add('hidden');
-
-      // Re-render formulas
-      if (window.MathJax) {
-        MathJax.typesetPromise();
-      }
+      renderProgressDots(state, quiz);
+      updateScoreDisplay(state);
+      updateTimerDisplay(state);
+      typesetMath();
     }
 
-    // Timer controls
-    function startTimer() {
+    function loadQuestion(regenerate = true) {
+      clearInterval(timerInterval);
+      const state = getState();
+      const quiz = getQuiz();
+
+      if (regenerate) {
+        state.timeLeft = quiz.timerSeconds;
+        state.answeredThisQuestion = false;
+      }
+
+      if (!state.initialized) {
+        shuffleQuestions(state, quiz);
+        state.initialized = true;
+      }
+
+      if (regenerate) {
+        const templateIndex = state.shuffledIndices[state.currentOrderIndex];
+        state.currentTemplate = quiz.templates[templateIndex];
+        state.currentData = state.currentTemplate.generate();
+      }
+
+      syncQuestionUI(state, quiz);
+      startTimer(state);
+    }
+
+    function startTimer(state) {
       timerInterval = setInterval(() => {
-        timeLeft--;
-        updateTimerDisplay();
-        if (timeLeft <= 0) {
+        state.timeLeft--;
+        updateTimerDisplay(state);
+        if (state.timeLeft <= 0) {
           clearInterval(timerInterval);
           const feedback = document.getElementById('feedback');
-          feedback.innerText = "⏰ Time's up! Check the correction below.";
-          feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block";
+          feedback.innerText = "Time's up! Check the detailed correction below.";
+          feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block';
         }
       }, 1000);
     }
 
-    function updateTimerDisplay() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    function updateTimerDisplay(state) {
+      const minutes = Math.floor(state.timeLeft / 60);
+      const seconds = state.timeLeft % 60;
+      document.getElementById('timer').innerText =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       const timerEl = document.getElementById('timer');
-      timerEl.innerText = display;
+      timerEl.className = state.timeLeft <= 30 ? UI.timerLow : UI.timerOk;
+    }
 
-      if (timeLeft <= 30) {
-        timerEl.className = "text-2xl font-mono font-bold text-red-600 bg-red-50 px-3 py-1 rounded-md animate-pulse";
+    function updateScoreDisplay(state) {
+      document.getElementById('score-display').textContent = `${state.sessionCorrect} / ${state.sessionAttempts}`;
+    }
+
+    function switchQuiz(quizId) {
+      if (quizId === activeQuizId) return;
+      clearInterval(timerInterval);
+      activeQuizId = quizId;
+      const quiz = getQuiz();
+      applyTheme(quiz.theme);
+      updateTabButtons();
+      const state = getState();
+      if (!state.initialized) {
+        loadQuestion(true);
       } else {
-        timerEl.className = "text-2xl font-mono font-bold text-emerald-600 bg-slate-100 px-3 py-1 rounded-md";
+        syncQuestionUI(state, quiz);
+        startTimer(state);
       }
     }
 
-    // Generate new variables for current question
     function generateNewVariables() {
-      loadQuestion();
+      loadQuestion(true);
     }
 
-    // Next question handler
     function nextQuestion() {
-      currentOrderIndex++;
-      if (currentOrderIndex >= questionTemplates.length) {
-        shuffleQuestions();
+      const state = getState();
+      const quiz = getQuiz();
+      state.currentOrderIndex++;
+      if (state.currentOrderIndex >= quiz.templates.length) {
+        shuffleQuestions(state, quiz);
       }
-      loadQuestion();
+      loadQuestion(true);
     }
 
-    // Check user answer
     function checkAnswer() {
+      const state = getState();
       const userVal = parseFloat(document.getElementById('user-answer').value);
       const feedback = document.getElementById('feedback');
 
       if (isNaN(userVal)) {
-        feedback.innerText = "Please enter a valid numeric value.";
-        feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block";
+        feedback.innerText = 'Please enter a valid number.';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-amber-100 text-amber-800 block';
         return;
       }
 
-      const expected = currentData.target;
-      // Allow 1% relative margin or 0.05 absolute margin of error
-      const isCorrect = Math.abs(userVal - expected) < 0.1 || Math.abs((userVal - expected) / expected) < 0.01;
+      const expected = state.currentData.target;
+      const isCorrect = isAnswerCorrect(userVal, expected, state.currentTemplate);
+
+      if (!state.answeredThisQuestion) {
+        state.sessionAttempts++;
+        if (isCorrect) state.sessionCorrect++;
+        state.answeredThisQuestion = true;
+        updateScoreDisplay(state);
+      }
 
       if (isCorrect) {
-        feedback.innerText = "Correct! Great job!";
-        feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-emerald-100 text-emerald-800 block";
+        feedback.innerText = 'Correct! Great job!';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-emerald-100 text-emerald-800 block';
       } else {
-        feedback.innerText = "Incorrect answer. Try again or check the detailed correction.";
-        feedback.className = "text-sm font-semibold p-3 rounded-lg text-center bg-rose-100 text-rose-800 block";
+        feedback.innerText = 'Incorrect. Try again or show the detailed correction.';
+        feedback.className = 'text-sm font-semibold p-3 rounded-lg text-center bg-rose-100 text-rose-800 block';
       }
     }
 
-    // Reveal correction & stop timer
     function revealCorrection() {
       clearInterval(timerInterval);
-      
-      const correctionBox = document.getElementById('correction-box');
-      const formulaEl = document.getElementById('correction-formula');
-      const stepsEl = document.getElementById('correction-steps');
+      const state = getState();
+      document.getElementById('correction-formula').innerHTML =
+        renderFormulaHtml(state.currentData.formula);
+      const steps = state.currentData.getSteps(state.currentData.params);
+      document.getElementById('correction-steps').innerHTML = renderCorrectionSteps(steps);
+      document.getElementById('correction-expected').innerText =
+        'Expected answer: ' + formatExpected(state.currentData.target, state.currentTemplate);
+      document.getElementById('correction-box').classList.remove('hidden');
+      typesetMath([document.getElementById('correction-box')]);
+    }
 
-      formulaEl.innerHTML = currentData.formula;
-      
-      const steps = currentData.getSteps(currentData.params);
-      stepsEl.innerHTML = steps.map(step => `<p>• ${step}</p>`).join('');
+    const MOCK5_PYTHON_SOLVER = `# Fin Markets Fast Solver (Tout en decimal) - Mock 5
 
-      correctionBox.classList.remove('hidden');
 
-      if (window.MathJax) {
-        MathJax.typesetPromise();
+def q1():
+    print("\\n--- Q1 : HPR 1-an Zero-Coupon ---")
+    t = float(input("T initial (ex: 15) : "))
+    y0 = float(input("y0 (ex: 0.037) : "))
+    y1 = float(input("y1 (ex: 0.011) : "))
+
+    hpr = (((1 + y0) ** t) / ((1 + y1) ** (t - 1))) - 1
+
+    print("----------------------")
+    print("HPR =", round(hpr, 4))
+
+
+def q2():
+    print("\\n--- Q2 : Spot r_T via Forward ---")
+    t = float(input("Date t (ex: 4) : "))
+    rt = float(input("Spot r_t (ex: 0.043) : "))
+    dt = float(input("Duree fwd (ex: 1) : "))
+    f = float(input("Fwd f (ex: 0.084) : "))
+
+    t_big = t + dt
+    r_big = (((1 + rt) ** t) * ((1 + f) ** dt)) ** (1 / t_big) - 1
+
+    print("----------------------")
+    print("r_" + str(int(t_big)) + " =", round(r_big, 4))
+
+
+def q3():
+    print("\\n--- Q3 : No-Arbitrage (Meme Rating) ---")
+    n1 = float(input("Nominal ZC1 (t=2) : "))
+    n2 = float(input("Nominal Oblig2 (t=2) : "))
+    c2_rate = float(input("Taux coupon 2 (ex: 1.0) : "))
+    p2 = float(input("Prix Oblig2 : "))
+    n3 = float(input("Nominal ZC3 (t=1) : "))
+    p3 = float(input("Prix ZC3 : "))
+
+    c2 = n2 * c2_rate
+    # Replication t=2 : w2 * (c2 + n2) = n1
+    w2 = n1 / (c2 + n2)
+    # Replication t=1 : w2 * c2 + w3 * n3 = 0
+    w3 = -(w2 * c2) / n3
+
+    p1 = (w2 * p2) + (w3 * p3)
+
+    print("----------------------")
+    print("w2 =", round(w2, 4), "| w3 =", round(w3, 4))
+    print("Prix =", round(p1, 2))
+
+
+def q4():
+    print("\\n--- Q4 : Forward f(t -> t+1) ---")
+    t = float(input("Date t (ex: 4) : "))
+    rt = float(input("Spot r_t (ex: 0.035) : "))
+    bps = float(input("Ecart bps (ex: 25) : "))
+
+    rt1 = rt + (bps / 10000.0)
+    f = (((1 + rt1) ** (t + 1)) / ((1 + rt) ** t)) - 1
+
+    print("----------------------")
+    print("r_" + str(int(t + 1)) + " =", round(rt1, 6))
+    print("f =", round(f, 4))
+
+
+def q5():
+    print("\\n--- Q5 : Payoff Forward ---")
+    sens = input("Position (L=Long / S=Short) : ").upper()
+    nb = float(input("Nb contrats (ex: 58) : "))
+    taille = float(input("Taille contrat (ex: 197) : "))
+    f0 = float(input("Prix Fwd F0 (ex: 41) : "))
+    st = float(input("Prix Spot ST (ex: 48) : "))
+
+    if sens == "L":
+        payoff = nb * taille * (st - f0)
+    else:
+        payoff = nb * taille * (f0 - st)
+
+    print("----------------------")
+    print("Payoff =", int(round(payoff, 0)))
+
+
+def main():
+    while True:
+        print("\\n=== FIN SOLVER (MOCK 5) ===")
+        print("1: HPR 1-an Zero-Coupon")
+        print("2: Spot r_T depuis Fwd")
+        print("3: Prix No-Arbitrage (Rating)")
+        print("4: Forward f(t->t+1) + bps")
+        print("5: Payoff Contrat Forward")
+        print("0: Quitter")
+
+        choix = input("Q# (0-5) : ")
+        if choix == "1":
+            q1()
+        elif choix == "2":
+            q2()
+        elif choix == "3":
+            q3()
+        elif choix == "4":
+            q4()
+        elif choix == "5":
+            q5()
+        elif choix == "0":
+            break
+
+
+main()
+`;
+
+    function initMock5SolverPreview() {
+      const pre = document.getElementById('mock5-solver-preview');
+      if (pre) pre.textContent = MOCK5_PYTHON_SOLVER;
+    }
+
+    function showMock5SolverCopyFeedback(message, isError) {
+      const el = document.getElementById('mock5-solver-copy-feedback');
+      if (!el) return;
+      el.textContent = message;
+      el.className = isError
+        ? 'text-center text-xs font-semibold text-rose-700 mb-2'
+        : 'text-center text-xs font-semibold text-emerald-700 mb-2';
+      el.classList.remove('hidden');
+      clearTimeout(showMock5SolverCopyFeedback._timer);
+      showMock5SolverCopyFeedback._timer = setTimeout(() => el.classList.add('hidden'), 2800);
+    }
+
+    function copyMock5Solver() {
+      const done = () => showMock5SolverCopyFeedback('Copied to clipboard.', false);
+      const fail = () => {
+        showMock5SolverCopyFeedback('Copy failed — use Preview script source or Download .py.', true);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(MOCK5_PYTHON_SOLVER).then(done).catch(fail);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = MOCK5_PYTHON_SOLVER;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy') ? done() : fail();
+        } catch (e) {
+          fail();
+        }
+        document.body.removeChild(ta);
       }
     }
 
-    // Initialize App
+    function downloadMock5Solver() {
+      const blob = new Blob([MOCK5_PYTHON_SOLVER], { type: 'text/x-python;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'fin_markets_mock5_solver.py';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showMock5SolverCopyFeedback('Download started.', false);
+    }
+
     window.onload = () => {
-      shuffleQuestions();
-      loadQuestion();
+      initMock5SolverPreview();
+      applyTheme('indigo');
+      updateTabButtons();
+      loadQuestion(true);
     };
   </script>
 </body>
