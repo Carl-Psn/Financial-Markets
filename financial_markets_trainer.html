@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3–6 (bonds, term structure, forwards).">
+  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3–7 (bonds, duration, term structure, forwards).">
   <title>Financial Markets Quiz Trainer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -63,6 +63,12 @@
               class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
         <span class="sm:hidden">Mock Quiz 6 · Bonds</span>
         <span class="hidden sm:inline">Mock Quiz 6 — Replication, Duration &amp; Forwards</span>
+      </button>
+      <button type="button" role="tab" id="tab-quiz-7" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-7')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 7 · Forwards</span>
+        <span class="hidden sm:inline">Mock Quiz 7 — Forwards, Duration &amp; Yields</span>
       </button>
     </div>
     <p class="hidden sm:block text-xs text-slate-500 mt-2 text-center">Switch quizzes using the tabs above (single page — ready for Google Sites embed).</p>
@@ -150,6 +156,37 @@
           </button>
           <p id="numworks-solver-feedback-mock6" class="hidden text-[10px] text-emerald-600">Copied.</p>
           <pre id="numworks-solver-preview-mock6"
+               class="w-full text-[9px] sm:text-[10px] leading-snug overflow-x-auto p-2 rounded bg-slate-50/80 text-slate-600 border border-slate-100 max-h-36 sm:max-h-44"></pre>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <header id="header-quiz-7" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-sky-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 7 — Forwards, Duration &amp; Yield Sensitivity</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sky-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$P_0 = \frac{C}{1+y} + \cdots + \frac{C+N}{(1+y)^T} = \frac{C}{y}\left(1 - \frac{1}{(1+y)^T}\right) + \frac{N}{(1+y)^T}, \quad y = \text{yield-to-maturity}$$</div>
+      <div>$$P_0 = \frac{C}{1+r_1} + \frac{C}{(1+r_2)^2} + \cdots + \frac{C+N}{(1+r_T)^T}, \quad r_t = \text{t-year spot rate}$$</div>
+      <div>$$\frac{\Delta P_0}{P_0} = -D \times \frac{\Delta y}{1+y}$$</div>
+      <div>$$D = \sum_{t=1}^{T} w_t \times t, \quad w_t = \frac{\text{PV}(C_t)}{P_0} \text{ (Macaulay duration)}$$</div>
+      <div>
+        <p class="text-xs sm:text-sm text-slate-600 mb-1">Short forward payoff at maturity \(T\):</p>
+        <div>$$\text{Payoff}_{\text{short}} = N_{\text{contracts}} \times m \times (F_{0,T} - S_T)$$</div>
+      </div>
+    </div>
+    <div class="mt-2 pt-2 border-t border-sky-100/60">
+      <details class="text-left">
+        <summary class="cursor-pointer list-none text-center text-[10px] sm:text-[11px] text-slate-400 hover:text-sky-700 py-1 select-none">
+          NumWorks solver script
+        </summary>
+        <div class="mt-1.5 flex flex-col items-center gap-1">
+          <button type="button" onclick="copyNumworksSolver('mock7')"
+                  class="text-[10px] sm:text-[11px] text-slate-400 hover:text-sky-700 underline underline-offset-2">
+            Copy script
+          </button>
+          <p id="numworks-solver-feedback-mock7" class="hidden text-[10px] text-emerald-600">Copied.</p>
+          <pre id="numworks-solver-preview-mock7"
                class="w-full text-[9px] sm:text-[10px] leading-snug overflow-x-auto p-2 rounded bg-slate-50/80 text-slate-600 border border-slate-100 max-h-36 sm:max-h-44"></pre>
         </div>
       </details>
@@ -946,6 +983,141 @@
             }
           }
         ]
+      },
+      'mock-quiz-7': {
+        id: 'mock-quiz-7',
+        title: 'Mock Quiz 7',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'sky',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — Short Forward Payoff (Gold)',
+            answerKind: 'whole_euros',
+            decimals: 0,
+            generate: () => {
+              const contracts = Math.floor(Math.random() * 50) + 60;
+              const sizeG = Math.floor(Math.random() * 40) + 110;
+              const months = Math.floor(Math.random() * 13) + 12;
+              const fwdPrice = Math.floor(Math.random() * 20) + 45;
+              const spotDrop = Math.floor(Math.random() * 12) + 5;
+              const spotAtMat = fwdPrice - spotDrop;
+              const totalQty = contracts * sizeG;
+              const payoff = totalQty * (fwdPrice - spotAtMat);
+              return {
+                text: `You hold <b>${contracts} short</b> forward positions on gold. Each contract covers <b>${sizeG} grams</b>; maturity is <b>${months} months</b> (cash settlement). The forward price is <b>F(0,${months}m) = ${fwdPrice} €/gram</b>. At maturity, spot gold is <b>${spotAtMat} €/gram</b>. What is your total payoff in euros? <span class="text-sm font-semibold">Enter a whole number only (no decimal point, € sign, or commas).</span>`,
+                target: payoff,
+                params: { contracts, sizeG, months, fwdPrice, spotAtMat, totalQty, payoff, spotDrop },
+                formula: '$$\\text{Payoff}_{\\text{short}} = \\text{\\# contracts} \\times \\text{size per contract} \\times (F_{0,T} - S_T)$$',
+                getSteps: (p) => [
+                  { caption: 'Total quantity (grams)', latex: `${p.contracts} \\times ${p.sizeG} = ${p.totalQty}\\text{ g}` },
+                  { caption: 'Gain per gram (short)', latex: `F_{0,T} - S_T = ${p.fwdPrice} - ${p.spotAtMat} = ${p.fwdPrice - p.spotAtMat}\\text{ €/g}` },
+                  { caption: 'Total payoff', latex: `\\text{Payoff}_{\\text{short}} = ${p.totalQty} \\times ${p.fwdPrice - p.spotAtMat} = \\mathbf{${p.payoff}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — Equity Forward Delivery Price',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const s0 = (Math.floor(Math.random() * 250) + 250) / 10;
+              const b0 = (Math.floor(Math.random() * 120) + 820) / 10;
+              const N = 100;
+              const shares = [100, 50, 200][Math.floor(Math.random() * 3)];
+              const T = ((Math.floor(Math.random() * 15) + 18) / 10).toFixed(1);
+              const dT = b0 / N;
+              const fPerShare = s0 / dT;
+              const totalF = shares * fPerShare;
+              return {
+                text: `A stock pays <b>no dividends</b> for the next 10 years. One share trades at <b>S₀ = ${s0} euros</b>. A <b>${T}-year</b> government zero-coupon bond (face value <b>${N} euros</b>) trades at <b>B₀ = ${b0} euros</b>. What is the no-arbitrage <b>total delivery price</b> of a ${T}-year forward on <b>${shares} shares</b>? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: totalF,
+                params: { s0, b0, N, shares, T, dT, fPerShare, totalF },
+                formula: '$$F_{0,T} = \\frac{S_0}{d_T} = \\frac{S_0}{B_0/N}, \\quad \\text{Total} = \\text{shares} \\times F_{0,T}$$',
+                getSteps: (p) => [
+                  { caption: 'Discount factor', latex: `d_{${p.T}} = \\frac{B_0}{N} = \\frac{${p.b0}}{${p.N}} = ${p.dT.toFixed(4)}` },
+                  { caption: 'Forward price per share', latex: `F_{0,${p.T}} = \\frac{${p.s0}}{${p.dT.toFixed(4)}} = ${p.fPerShare.toFixed(6)}\\text{ €}` },
+                  { caption: 'Total delivery price', latex: `${p.shares} \\times ${p.fPerShare.toFixed(4)} = \\mathbf{${p.totalF.toFixed(2)}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — Zero-Coupon Bond Duration',
+            answerKind: 'integer',
+            generate: () => {
+              const T = Math.floor(Math.random() * 11) + 5;
+              const rPct = Math.floor(Math.random() * 8) + 3;
+              const N = 1000;
+              return {
+                text: `What is the <b>Macaulay duration</b> (in years) of a government zero-coupon bond with maturity <b>${T} years</b>, face value <b>${N} euros</b>, when the flat yield curve is at <b>${rPct}%</b> per year? <span class="text-sm font-semibold">Enter the duration as a whole number of years (e.g. 9).</span>`,
+                target: T,
+                params: { T, rPct, N },
+                formula: '$$\\text{For a zero-coupon bond: all cash flow at } T \\Rightarrow w_T = 1 \\Rightarrow D = T$$',
+                getSteps: (p) => [
+                  { caption: 'Zero coupon — single cash flow at maturity', latex: `C_t = 0 \\text{ for } t < ${p.T},\\quad \\text{CF}_{${p.T}} = ${p.N}\\text{ €}` },
+                  { caption: 'Weight at maturity', latex: `w_{${p.T}} = 1 \\implies D = 1 \\times ${p.T}` },
+                  { caption: 'Duration', latex: `D = \\mathbf{${p.T}}\\text{ years}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — Short Forward Payoff (Equity)',
+            answerKind: 'integer',
+            generate: () => {
+              const contracts = Math.floor(Math.random() * 40) + 70;
+              const sharesPer = 100;
+              const f0 = Math.floor(Math.random() * 80) + 220;
+              const spotUp = Math.floor(Math.random() * 18) + 5;
+              const sT = f0 + spotUp;
+              const totalShares = contracts * sharesPer;
+              const payoff = totalShares * (f0 - sT);
+              return {
+                text: `You sold <b>${contracts} short</b> forward contracts on a stock (${sharesPer} shares per contract). The locked-in delivery price was <b>F₀ = ${f0} USD/share</b>. At maturity, the spot price is <b>${sT} USD/share</b>. What is your <b>total payoff in USD</b>? <span class="text-sm font-semibold">Enter a whole number including the minus sign if negative (no $ sign or commas).</span>`,
+                target: payoff,
+                params: { contracts, sharesPer, f0, sT, totalShares, payoff, spotUp },
+                formula: '$$\\text{Payoff}_{\\text{short}} = N_{\\text{contracts}} \\times m \\times (F_0 - S_T)$$',
+                getSteps: (p) => [
+                  { caption: 'Total shares', latex: `${p.contracts} \\times ${p.sharesPer} = ${p.totalShares}\\text{ shares}` },
+                  { caption: 'Payoff per share (short)', latex: `F_0 - S_T = ${p.f0} - ${p.sT} = ${p.f0 - p.sT}\\text{ USD/share}` },
+                  { caption: 'Total payoff', latex: `${p.totalShares} \\times (${p.f0 - p.sT}) = \\mathbf{${p.payoff}}\\text{ USD}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Price Change (Duration & bps)',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const T = Math.floor(Math.random() * 11) + 15;
+              const yPct = Math.floor(Math.random() * 3) + 1;
+              const bps = [20, 25, 28, 32, 35, 40][Math.floor(Math.random() * 6)];
+              const y = yPct / 100;
+              const dy = bps / 10000;
+              const dpP = -T * (dy / (1 + y));
+              return {
+                text: `The government zero-coupon yield curve is <b>flat at ${yPct}%</b> per year. Using duration, what is the <b>percentage change</b> in the price of a <b>${T}-year</b> zero-coupon bond if the entire curve shifts up by <b>${bps} basis points</b>? (1 bp = 0.01%.) <span class="text-sm font-semibold">Enter as a decimal with four digits (e.g. −3% → <b>−0.0300</b>).</span>`,
+                target: dpP,
+                params: { T, yPct, y, bps, dy, dpP },
+                formula: '$$\\frac{\\Delta P_0}{P_0} = -D \\times \\frac{\\Delta y}{1+y}, \\quad D = T \\text{ (zero-coupon)}$$',
+                getSteps: (p) => [
+                  { caption: 'Duration (zero-coupon)', latex: `D = T = ${p.T}\\text{ years}` },
+                  { caption: 'Yield shift', latex: `\\Delta y = ${p.bps}\\text{ bps} = ${p.dy.toFixed(4)}` },
+                  { caption: 'Relative price change', latex: `\\frac{\\Delta P_0}{P_0} = -${p.T} \\times \\frac{${p.dy.toFixed(4)}}{1 + ${p.y.toFixed(2)}} = \\mathbf{${p.dpP.toFixed(6)}}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.dpP.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          }
+        ]
       }
     };
 
@@ -1026,7 +1198,8 @@
       { id: 'mock-quiz-3', tabId: 'tab-quiz-3', headerId: 'header-quiz-3', activeTab: 'bg-teal-600 text-white' },
       { id: 'mock-quiz-4', tabId: 'tab-quiz-4', headerId: 'header-quiz-4', activeTab: 'bg-violet-600 text-white' },
       { id: 'mock-quiz-5', tabId: 'tab-quiz-5', headerId: 'header-quiz-5', activeTab: 'bg-amber-600 text-white' },
-      { id: 'mock-quiz-6', tabId: 'tab-quiz-6', headerId: 'header-quiz-6', activeTab: 'bg-rose-600 text-white' }
+      { id: 'mock-quiz-6', tabId: 'tab-quiz-6', headerId: 'header-quiz-6', activeTab: 'bg-rose-600 text-white' },
+      { id: 'mock-quiz-7', tabId: 'tab-quiz-7', headerId: 'header-quiz-7', activeTab: 'bg-sky-600 text-white' }
     ];
 
     const THEME_STYLES = {
@@ -1089,6 +1262,18 @@
         tag: 'bg-rose-100 text-rose-800',
         progressActive: 'bg-rose-600',
         progressDone: 'bg-rose-300'
+      },
+      sky: {
+        score: 'font-bold text-sky-700',
+        secondary: 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100',
+        validate: 'bg-sky-600 hover:bg-sky-700',
+        reveal: 'text-sky-700 hover:text-sky-900',
+        inputRing: 'focus:ring-sky-500',
+        correctionBorder: 'border-sky-100',
+        correctionFormula: 'bg-sky-50/50 border-sky-100',
+        tag: 'bg-sky-100 text-sky-800',
+        progressActive: 'bg-sky-600',
+        progressDone: 'bg-sky-300'
       }
     };
 
@@ -1582,9 +1767,135 @@ def main():
 main()
 `;
 
+    const MOCK7_PYTHON_SOLVER = `# Fin Markets Fast Solver (Tout en decimal) - Mock 7
+
+
+def q1():
+    print("\\n--- Q1 : Payoff Forward (Commodites) ---")
+    sens = input("Position (L=Long / S=Short) : ").upper()
+    nb = float(input("Nb contrats (ex: 91) : "))
+    taille = float(input("Taille contrat (ex: 127) : "))
+    f0 = float(input("Prix Fwd F0 (ex: 56) : "))
+    st = float(input("Prix Spot ST (ex: 46) : "))
+
+    if sens == "L":
+        payoff = nb * taille * (st - f0)
+    else:
+        payoff = nb * taille * (f0 - st)
+
+    print("----------------------")
+    print("Payoff =", int(round(payoff, 0)))
+
+
+def q2():
+    print("\\n--- Q2 : Prix Livraison Forward ---")
+    s0 = float(input("Prix action S0 (ex: 36.5) : "))
+    b0 = float(input("Prix ZC B0 (ex: 87.1) : "))
+    n = float(input("Nominal ZC N (ex: 100) : "))
+    nb = float(input("Nb actions (ex: 100) : "))
+
+    d_t = b0 / n
+    f0 = s0 / d_t
+    total_f = nb * f0
+
+    print("----------------------")
+    print("F0/action =", round(f0, 4))
+    print("Total =", round(total_f, 2))
+
+
+def q3():
+    print("\\n--- Q3 : Duration Obligation ---")
+    t = int(input("Maturite T (annees) : "))
+    c_rate = float(input("Taux coupon (0 si ZC) : "))
+
+    if c_rate == 0:
+        d = t
+    else:
+        y = float(input("YTM y (ex: 0.07) : "))
+        n = 100.0
+        c = n * c_rate
+        pvs = [
+            (c + n if i == t else c) / ((1 + y) ** i) for i in range(1, t + 1)
+        ]
+        d = sum([i * pv for i, pv in enumerate(pvs, 1)]) / sum(pvs)
+
+    print("----------------------")
+    print("Duration D =", round(d, 4))
+
+
+def q4():
+    print("\\n--- Q4 : Payoff Forward (Actions) ---")
+    sens = input("Position (L=Long / S=Short) : ").upper()
+    nb = float(input("Nb contrats (ex: 97) : "))
+    m = float(input("Actions/contrat (ex: 100) : "))
+    f0 = float(input("Prix Fwd F0 (ex: 270) : "))
+    st = float(input("Prix Spot ST (ex: 282) : "))
+
+    if sens == "L":
+        payoff = nb * m * (st - f0)
+    else:
+        payoff = nb * m * (f0 - st)
+
+    print("----------------------")
+    print("Payoff =", int(round(payoff, 0)))
+
+
+def q5():
+    print("\\n--- Q5 : Variation Prix (% Delta P) ---")
+    t = int(input("Maturite T (ex: 20) : "))
+    c_rate = float(input("Taux coupon (0 si ZC) : "))
+    y = float(input("Taux y (ex: 0.02) : "))
+    bps = float(input("Variation bps (ex: 32) : "))
+
+    if c_rate == 0:
+        d = t
+    else:
+        n = 100.0
+        c = n * c_rate
+        pvs = [
+            (c + n if i == t else c) / ((1 + y) ** i) for i in range(1, t + 1)
+        ]
+        d = sum([i * pv for i, pv in enumerate(pvs, 1)]) / sum(pvs)
+
+    dy = bps / 10000.0
+    dp_p = -d * (dy / (1 + y))
+
+    print("----------------------")
+    print("Delta P / P0 =", round(dp_p, 4))
+
+
+def main():
+    while True:
+        print("\\n=== FIN SOLVER (MOCK 7) ===")
+        print("1: Payoff Fwd (Commodites)")
+        print("2: Prix Livraison Forward")
+        print("3: Duration (ZC ou Coupon)")
+        print("4: Payoff Fwd (Actions)")
+        print("5: Delta P / P0 (bps)")
+        print("0: Quitter")
+
+        choix = input("Q# (0-5) : ")
+        if choix == "1":
+            q1()
+        elif choix == "2":
+            q2()
+        elif choix == "3":
+            q3()
+        elif choix == "4":
+            q4()
+        elif choix == "5":
+            q5()
+        elif choix == "0":
+            break
+
+
+main()
+`;
+
     const NUMWORKS_SOLVERS = {
       mock5: MOCK5_PYTHON_SOLVER,
-      mock6: MOCK6_PYTHON_SOLVER
+      mock6: MOCK6_PYTHON_SOLVER,
+      mock7: MOCK7_PYTHON_SOLVER
     };
 
     function initNumworksSolverPreviews() {
