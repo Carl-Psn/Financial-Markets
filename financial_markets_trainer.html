@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3–7 (bonds, duration, term structure, forwards).">
+  <meta name="description" content="Financial Markets Mock Quiz Trainer — Mock Quiz 2 (equities), Mock Quiz 3–8 (bonds, duration, term structure, forwards, cost of carry).">
   <title>Financial Markets Quiz Trainer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -69,6 +69,12 @@
               class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
         <span class="sm:hidden">Mock Quiz 7 · Forwards</span>
         <span class="hidden sm:inline">Mock Quiz 7 — Forwards, Duration &amp; Yields</span>
+      </button>
+      <button type="button" role="tab" id="tab-quiz-8" aria-selected="false" aria-controls="panel-quiz"
+              onclick="switchQuiz('mock-quiz-8')"
+              class="quiz-tab flex-1 min-h-[44px] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition leading-snug text-slate-600 hover:bg-slate-50">
+        <span class="sm:hidden">Mock Quiz 8 · Forwards</span>
+        <span class="hidden sm:inline">Mock Quiz 8 — Forwards &amp; Cost of Carry</span>
       </button>
     </div>
     <p class="hidden sm:block text-xs text-slate-500 mt-2 text-center">Switch quizzes using the tabs above (single page — ready for Google Sites embed).</p>
@@ -187,6 +193,32 @@
           </button>
           <p id="numworks-solver-feedback-mock7" class="hidden text-[10px] text-emerald-600">Copied.</p>
           <pre id="numworks-solver-preview-mock7"
+               class="w-full text-[9px] sm:text-[10px] leading-snug overflow-x-auto p-2 rounded bg-slate-50/80 text-slate-600 border border-slate-100 max-h-36 sm:max-h-44"></pre>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <header id="header-quiz-8" class="hidden w-full max-w-4xl bg-white shadow-md rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-t-4 border-emerald-600">
+    <h1 class="text-base sm:text-lg font-bold text-slate-800 text-center mb-1 px-1">Mock Quiz 8 — Forwards, Carry &amp; Spot Rates</h1>
+    <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2 text-center">Reference Formulas</h2>
+    <div class="formula-scroll text-center text-xs sm:text-sm md:text-base text-slate-700 py-2 space-y-3">
+      <div>$$F_{0,T} = \left(S_0 - \frac{I_t}{(1+r_t)^{t}}\right) \times (1+r_T)^{T}, \quad I_t = \text{interim cash flow at date } t < T$$</div>
+      <div>$$F_{0,T} = S_0 \times (1+r_T)^T \quad \text{(zero interim cash flows: } I_t = 0\text{)}$$</div>
+      <div>$$F_{0,T} = \left(S_0 + \frac{U_t}{(1+r_t)^t}\right) \times (1+r_T)^T \quad \text{(storage cost } U_t \text{ paid at } t\text{)}$$</div>
+    </div>
+    <div class="mt-2 pt-2 border-t border-emerald-100/60">
+      <details class="text-left">
+        <summary class="cursor-pointer list-none text-center text-[10px] sm:text-[11px] text-slate-400 hover:text-emerald-700 py-1 select-none">
+          NumWorks solver script
+        </summary>
+        <div class="mt-1.5 flex flex-col items-center gap-1">
+          <button type="button" onclick="copyNumworksSolver('mock8')"
+                  class="text-[10px] sm:text-[11px] text-slate-400 hover:text-emerald-700 underline underline-offset-2">
+            Copy script
+          </button>
+          <p id="numworks-solver-feedback-mock8" class="hidden text-[10px] text-emerald-600">Copied.</p>
+          <pre id="numworks-solver-preview-mock8"
                class="w-full text-[9px] sm:text-[10px] leading-snug overflow-x-auto p-2 rounded bg-slate-50/80 text-slate-600 border border-slate-100 max-h-36 sm:max-h-44"></pre>
         </div>
       </details>
@@ -1118,6 +1150,158 @@
             }
           }
         ]
+      },
+      'mock-quiz-8': {
+        id: 'mock-quiz-8',
+        title: 'Mock Quiz 8',
+        questionCount: 5,
+        timerSeconds: 180,
+        theme: 'emerald',
+        templates: [
+          {
+            id: 1,
+            title: 'Q1 — Forward on Coupon Bond (After Coupon)',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = (Math.floor(Math.random() * 11) + 14) * 50;
+              const couponPct = (Math.floor(Math.random() * 35) + 45) / 10;
+              const ySpread = (Math.floor(Math.random() * 3) + 1) * (Math.random() < 0.5 ? -1 : 1);
+              let yPct = couponPct + ySpread;
+              if (Math.abs(yPct - couponPct) < 0.5) yPct = couponPct + 1.2;
+              const c = couponPct / 100;
+              const y = yPct / 100;
+              const bondYrs = Math.floor(Math.random() * 8) + 8;
+              const C = N * c;
+              const discBond = Math.pow(1 + y, bondYrs);
+              const s0 = (C / y) * (1 - 1 / discBond) + N / discBond;
+              const r = y;
+              const tCpn = 1;
+              const tFwd = 1;
+              const iT = C;
+              const f0 = (s0 - iT / Math.pow(1 + r, tCpn)) * Math.pow(1 + r, tFwd);
+              return {
+                text: `A coupon-paying government bond has face value <b>${N} euros</b>, annual coupon rate <b>${couponPct}%</b>, and price today <b>S₀ = ${s0.toFixed(2)} euros</b>. The risk-free yield curve is flat at <b>${yPct.toFixed(1)}%</b> per year. The first coupon is paid in exactly <b>1 year</b> (morning). You initiate a forward today that delivers one bond in <b>1 year</b> (afternoon, right after that coupon). What is the no-arbitrage forward delivery price? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: f0,
+                params: { N, couponPct, yPct, y, bondYrs, C, s0, r, tCpn, tFwd, iT, f0 },
+                formula: '$$F_{0,T} = \\left(S_0 - \\frac{I_t}{(1+r_t)^{t}}\\right) \\times (1+r_T)^{T}$$',
+                getSteps: (p) => [
+                  { caption: 'Interim coupon at t = 1', latex: `I_1 = ${p.couponPct}\\% \\times ${p.N} = ${p.iT.toFixed(4)}\\text{ €}` },
+                  { caption: 'PV of interim flow', latex: `\\frac{I_1}{(1+r_1)^{1}} = \\frac{${p.iT.toFixed(4)}}{1 + ${p.y.toFixed(4)}} = ${(p.iT / (1 + p.y)).toFixed(6)}\\text{ €}` },
+                  { caption: 'Forward price', latex: `F_{0,1} = (${p.s0.toFixed(4)} - ${(p.iT / (1 + p.y)).toFixed(4)}) \\times (1 + ${p.y.toFixed(4)}) = \\mathbf{${p.f0.toFixed(2)}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 2,
+            title: 'Q2 — Zero-Coupon Bond Forward',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const s0 = Math.floor(Math.random() * 120) + 140;
+              const bondYrs = Math.floor(Math.random() * 10) + 12;
+              const rPct = Math.floor(Math.random() * 3) + 2;
+              const fwdYrs = Math.floor(Math.random() * 4) + 2;
+              const r = rPct / 100;
+              const f0 = s0 * Math.pow(1 + r, fwdYrs);
+              return {
+                text: `A corporate zero-coupon bond trades at <b>${s0} euros</b> today and matures in <b>${bondYrs} years</b>. The government yield curve is flat at <b>${rPct}%</b> per year. What is the no-arbitrage forward delivery price for delivery in <b>${fwdYrs} years</b> (initiated today)? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: f0,
+                params: { s0, bondYrs, rPct, r, fwdYrs, f0 },
+                formula: '$$F_{0,T} = S_0 \\times (1+r_T)^T \\quad \\text{(no interim cash flows before } T\\text{)}$$',
+                getSteps: (p) => [
+                  { caption: 'Spot-forward parity (flat rate)', latex: `F_{0,${p.fwdYrs}} = ${p.s0} \\times (1 + ${p.r})^{${p.fwdYrs}}` },
+                  { caption: 'Compound factor', latex: `(1 + ${p.r})^{${p.fwdYrs}} = ${Math.pow(1 + p.r, p.fwdYrs).toFixed(6)}` },
+                  { caption: 'Forward price', latex: `F_{0,${p.fwdYrs}} = \\mathbf{${p.f0.toFixed(2)}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 3,
+            title: 'Q3 — Forward Before Next Coupon',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const N = 1000;
+              const ratePct = Math.floor(Math.random() * 4) + 4;
+              const bondYrs = Math.floor(Math.random() * 6) + 10;
+              const months = [6, 9, 12][Math.floor(Math.random() * 3)];
+              const y = ratePct / 100;
+              const s0 = N;
+              const tFwd = months / 12;
+              const f0 = s0 * Math.pow(1 + y, tFwd);
+              return {
+                text: `A default-risk-free coupon bond has face value <b>${N} euros</b>, coupon rate <b>${ratePct}%</b> per year (annual payments), and <b>${bondYrs} years</b> to maturity. The yield curve is flat at <b>${ratePct}%</b>. At par, <b>S₀ = ${N} euros</b>. No coupon falls within the next <b>${months} months</b>. What is the no-arbitrage forward delivery price for a contract maturing in <b>${months} months</b>? <span class="text-sm text-slate-500">(Round to 2 decimal places.)</span>`,
+                target: f0,
+                params: { N, ratePct, bondYrs, months, y, s0, tFwd, f0 },
+                formula: '$$F_{0,T} = S_0 \\times (1+r_T)^T \\quad \\text{(no coupon with } t < T\\text{)}$$',
+                getSteps: (p) => [
+                  { caption: 'Maturity in years', latex: `T = \\frac{${p.months}}{12} = ${p.tFwd.toFixed(4)}\\text{ years}` },
+                  { caption: 'Forward on par bond', latex: `F_{0,T} = ${p.s0} \\times (1 + ${p.y})^{${p.tFwd.toFixed(4)}}` },
+                  { caption: 'Result', latex: `F_{0,${p.months}m} = \\mathbf{${p.f0.toFixed(2)}}\\text{ €}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 4,
+            title: 'Q4 — Implied Spot Rate from Forward',
+            answerKind: 'decimal',
+            decimals: 4,
+            generate: () => {
+              const s0 = Math.floor(Math.random() * 60) + 90;
+              const T = Math.floor(Math.random() * 2) + 2;
+              const rPct = (Math.floor(Math.random() * 35) + 40) / 10;
+              const r = rPct / 100;
+              const f0 = Math.round(s0 * Math.pow(1 + r, T) * 100) / 100;
+              const rImplied = Math.pow(f0 / s0, 1 / T) - 1;
+              return {
+                text: `Stock A pays its next dividend in more than <b>${T} years</b>. Current price is <b>S₀ = ${s0} euros/share</b>. The no-arbitrage forward delivery price for one share in <b>${T} years</b> is <b>${f0.toFixed(2)} euros/share</b>. What is the <b>${T}-year</b> spot interest rate \\(r_{${T}}\\) (per annum)? <span class="text-sm font-semibold">Enter as a decimal with four digits (e.g. 6.30% → <b>0.0630</b>).</span>`,
+                target: rImplied,
+                params: { s0, T, rPct, r, f0, rImplied },
+                formula: '$$F_{0,T} = S_0 \\times (1+r_T)^T \\implies r_T = \\left(\\frac{F_{0,T}}{S_0}\\right)^{1/T} - 1$$',
+                getSteps: (p) => [
+                  { caption: 'Compounding factor', latex: `(1+r_{${p.T}})^{${p.T}} = \\frac{F_{0,${p.T}}}{S_0} = \\frac{${p.f0.toFixed(2)}}{${p.s0}} = ${(p.f0 / p.s0).toFixed(6)}` },
+                  { caption: `${p.T}-year spot rate`, latex: `r_{${p.T}} = \\left(\\frac{${p.f0.toFixed(2)}}{${p.s0}}\\right)^{1/${p.T}} - 1 = ${p.rImplied.toFixed(6)}` },
+                  { caption: 'Answer format', latex: `\\text{enter } \\mathbf{${p.rImplied.toFixed(4)}} \\text{ as a decimal}` }
+                ]
+              };
+            }
+          },
+          {
+            id: 5,
+            title: 'Q5 — Gold Forward (Storage Cost)',
+            answerKind: 'currency',
+            decimals: 2,
+            generate: () => {
+              const s0 = Math.floor(Math.random() * 350) + 2850;
+              const costPerYear = Math.floor(Math.random() * 4) + 3;
+              const yearsPaid = 2;
+              const u1 = costPerYear * yearsPaid;
+              const r1Pct = (Math.floor(Math.random() * 22) + 34) / 10;
+              const r2Pct = r1Pct + (Math.floor(Math.random() * 5) + 2) / 10;
+              const r1 = r1Pct / 100;
+              const r2 = r2Pct / 100;
+              const T = 2;
+              const pvStorage = u1 / Math.pow(1 + r1, 1);
+              const f0 = (s0 + pvStorage) * Math.pow(1 + r2, T);
+              return {
+                text: `Gold spot is <b>${s0} GBP</b> per troy ounce. Storage costs <b>${costPerYear} GBP/oz/year</b>; you pay <b>${yearsPaid} years</b> of storage as a lump sum at <b>t = 1</b> (for storage from t = 0 to t = 2). Spot rates: \\(r_1 = ${r1Pct.toFixed(2)}\\%\\), \\(r_2 = ${r2Pct.toFixed(2)}\\%\\). What is the no-arbitrage forward price for delivery at <b>t = 2</b> of one troy ounce? <span class="text-sm text-slate-500">(Answer in GBP, 2 decimal places.)</span>`,
+                target: f0,
+                params: { s0, costPerYear, yearsPaid, u1, r1Pct, r2Pct, r1, r2, T, pvStorage, f0 },
+                formula: '$$F_{0,2} = \\left(S_0 + \\frac{U_1}{(1+r_1)}\\right) \\times (1+r_2)^2$$',
+                getSteps: (p) => [
+                  { caption: 'Storage paid at t = 1', latex: `U_1 = ${p.yearsPaid} \\times ${p.costPerYear} = ${p.u1}\\text{ GBP}` },
+                  { caption: 'PV of storage', latex: `\\frac{U_1}{1+r_1} = \\frac{${p.u1}}{${(1 + p.r1).toFixed(4)}} = ${p.pvStorage.toFixed(6)}\\text{ GBP}` },
+                  { caption: 'Adjusted carry', latex: `S_0 + \\text{PV}(U) = ${p.s0} + ${p.pvStorage.toFixed(4)} = ${(p.s0 + p.pvStorage).toFixed(4)}` },
+                  { caption: 'Forward price', latex: `F_{0,2} = ${(p.s0 + p.pvStorage).toFixed(4)} \\times (1 + ${p.r2})^{2} = \\mathbf{${p.f0.toFixed(2)}}\\text{ GBP}` }
+                ]
+              };
+            }
+          }
+        ]
       }
     };
 
@@ -1199,7 +1383,8 @@
       { id: 'mock-quiz-4', tabId: 'tab-quiz-4', headerId: 'header-quiz-4', activeTab: 'bg-violet-600 text-white' },
       { id: 'mock-quiz-5', tabId: 'tab-quiz-5', headerId: 'header-quiz-5', activeTab: 'bg-amber-600 text-white' },
       { id: 'mock-quiz-6', tabId: 'tab-quiz-6', headerId: 'header-quiz-6', activeTab: 'bg-rose-600 text-white' },
-      { id: 'mock-quiz-7', tabId: 'tab-quiz-7', headerId: 'header-quiz-7', activeTab: 'bg-sky-600 text-white' }
+      { id: 'mock-quiz-7', tabId: 'tab-quiz-7', headerId: 'header-quiz-7', activeTab: 'bg-sky-600 text-white' },
+      { id: 'mock-quiz-8', tabId: 'tab-quiz-8', headerId: 'header-quiz-8', activeTab: 'bg-emerald-600 text-white' }
     ];
 
     const THEME_STYLES = {
@@ -1274,6 +1459,18 @@
         tag: 'bg-sky-100 text-sky-800',
         progressActive: 'bg-sky-600',
         progressDone: 'bg-sky-300'
+      },
+      emerald: {
+        score: 'font-bold text-emerald-700',
+        secondary: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+        validate: 'bg-emerald-600 hover:bg-emerald-700',
+        reveal: 'text-emerald-700 hover:text-emerald-900',
+        inputRing: 'focus:ring-emerald-500',
+        correctionBorder: 'border-emerald-100',
+        correctionFormula: 'bg-emerald-50/50 border-emerald-100',
+        tag: 'bg-emerald-100 text-emerald-800',
+        progressActive: 'bg-emerald-600',
+        progressDone: 'bg-emerald-300'
       }
     };
 
@@ -1892,10 +2089,125 @@ def main():
 main()
 `;
 
+    const MOCK8_PYTHON_SOLVER = `# Fin Markets Fast Solver (Tout en decimal) - Mock 8
+
+
+def q1():
+    print("\\n--- Q1 : Fwd Oblig (Apres Coupon) ---")
+    s0 = float(input("Prix S0 (€) : "))
+    n = float(input("Nominal N (€) : "))
+    c_rate = float(input("Taux coupon (ex: 0.059) : "))
+    r = float(input("Taux r (ex: 0.059) : "))
+    t_fwd = float(input("Mat Fwd T (ex: 1) : "))
+    t_cpn = float(input("Date cpn t (ex: 1) : "))
+
+    i_t = n * c_rate
+    pv_i = i_t / ((1 + r) ** t_cpn)
+    f0 = (s0 - pv_i) * ((1 + r) ** t_fwd)
+
+    print("----------------------")
+    print("F0 =", round(f0, 2))
+
+
+def q2():
+    print("\\n--- Q2 : Fwd Zero-Coupon ---")
+    s0 = float(input("Prix S0 (€) : "))
+    r = float(input("Taux r (ex: 0.03) : "))
+    t = float(input("Mat Fwd T (ans) : "))
+
+    f0 = s0 * ((1 + r) ** t)
+
+    print("----------------------")
+    print("F0 =", round(f0, 2))
+
+
+def q3():
+    print("\\n--- Q3 : Fwd Oblig (Avant Coupon) ---")
+    n = float(input("Nominal N (€) : "))
+    c_rate = float(input("Taux coupon (ex: 0.06) : "))
+    r = float(input("Taux plat r (ex: 0.06) : "))
+    t_bond = int(input("Mat Oblig (ans, ex: 14) : "))
+    mois = float(input("Mat Fwd (mois, ex: 6) : "))
+
+    if c_rate == r:
+        s0 = n
+    else:
+        c = n * c_rate
+        s0 = (c / r) * (1 - (1 / ((1 + r) ** t_bond))) + (
+            n / ((1 + r) ** t_bond)
+        )
+
+    t_fwd = mois / 12.0
+    f0 = s0 * ((1 + r) ** t_fwd)
+
+    print("----------------------")
+    print("S0 =", round(s0, 2))
+    print("F0 =", round(f0, 2))
+
+
+def q4():
+    print("\\n--- Q4 : Taux Spot Implicite r_T ---")
+    s0 = float(input("Prix S0 (€) : "))
+    f0 = float(input("Prix Fwd F0 (€) : "))
+    t = float(input("Mat Fwd T (ex: 2) : "))
+
+    r_t = (f0 / s0) ** (1 / t) - 1
+
+    print("----------------------")
+    print("r_" + str(int(t)) + " =", round(r_t, 4))
+
+
+def q5():
+    print("\\n--- Q5 : Fwd Or + Stockage ---")
+    s0 = float(input("Spot S0 (ex: 3124) : "))
+    cout_an = float(input("Cout/an (ex: 4) : "))
+    nb_ans = float(input("Nb ans payes (ex: 2) : "))
+    t_pay = float(input("Date paiement t (ex: 1) : "))
+    r_pay = float(input("Taux r_t (ex: 0.0378) : "))
+    t_fwd = float(input("Mat Fwd T (ex: 2) : "))
+    r_fwd = float(input("Taux r_T (ex: 0.0416) : "))
+
+    u_t = cout_an * nb_ans
+    pv_u = u_t / ((1 + r_pay) ** t_pay)
+    f0 = (s0 + pv_u) * ((1 + r_fwd) ** t_fwd)
+
+    print("----------------------")
+    print("F0 =", round(f0, 2))
+
+
+def main():
+    while True:
+        print("\\n=== FIN SOLVER (MOCK 8) ===")
+        print("1: Fwd Oblig (Apres Cpn)")
+        print("2: Fwd Zero-Coupon")
+        print("3: Fwd Oblig (Sans Cpn)")
+        print("4: Taux Spot via Fwd")
+        print("5: Fwd Or + Stockage")
+        print("0: Quitter")
+
+        choix = input("Q# (0-5) : ")
+        if choix == "1":
+            q1()
+        elif choix == "2":
+            q2()
+        elif choix == "3":
+            q3()
+        elif choix == "4":
+            q4()
+        elif choix == "5":
+            q5()
+        elif choix == "0":
+            break
+
+
+main()
+`;
+
     const NUMWORKS_SOLVERS = {
       mock5: MOCK5_PYTHON_SOLVER,
       mock6: MOCK6_PYTHON_SOLVER,
-      mock7: MOCK7_PYTHON_SOLVER
+      mock7: MOCK7_PYTHON_SOLVER,
+      mock8: MOCK8_PYTHON_SOLVER
     };
 
     function initNumworksSolverPreviews() {
